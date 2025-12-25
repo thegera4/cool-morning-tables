@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 
 export function Header() {
@@ -11,13 +11,20 @@ export function Header() {
                 </Link>
             </div>
             <div className="flex items-center gap-6">
-                <Link href="/reservas" className="text-white text-xs md:text-sm font-medium tracking-wider uppercase hover:underline underline-offset-4">
-                    MIS RESERVAS
-                </Link>
-                <Avatar className="h-8 w-8 cursor-pointer border-2 border-white/20">
-                    <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                    <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
+                <SignedIn>
+                    <Link href="/reservas" className="text-white text-xs md:text-sm font-medium tracking-wider uppercase hover:underline underline-offset-4">
+                        MIS RESERVAS
+                    </Link>
+                    <UserButton />
+                </SignedIn>
+                <SignedOut>
+                    <SignInButton mode="modal">
+                        <button className="text-white hover:text-teal-400 transition-colors">
+                            <span className="sr-only">Sign In</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                        </button>
+                    </SignInButton>
+                </SignedOut>
             </div>
         </header>
     );
