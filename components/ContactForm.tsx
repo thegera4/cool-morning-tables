@@ -1,0 +1,61 @@
+
+"use client";
+
+import { Input } from "@/components/ui/input";
+import { User } from "lucide-react";
+
+export interface ContactInfo {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+}
+
+interface ContactFormProps {
+    contactInfo: ContactInfo;
+    setContactInfo: (info: ContactInfo) => void;
+}
+
+export function ContactForm({ contactInfo, setContactInfo }: ContactFormProps) {
+    const handleChange = (field: keyof ContactInfo, value: string) => {
+        setContactInfo({ ...contactInfo, [field]: value });
+    };
+
+    return (
+        <div className="flex flex-col gap-6 p-6 bg-white rounded-lg shadow-sm border border-gray-100 h-full">
+            <div className="flex items-center gap-3 mb-2">
+                <User className="h-6 w-6 text-amber-700 stroke-[1.5]" />
+                <h3 className="text-teal-500 font-bold text-lg">Informacion de contacto</h3>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4">
+                <Input
+                    placeholder="Nombre(s)"
+                    value={contactInfo.firstName}
+                    onChange={(e) => handleChange("firstName", e.target.value)}
+                    className="bg-white border-gray-200"
+                />
+                <Input
+                    placeholder="Apellido(s)"
+                    value={contactInfo.lastName}
+                    onChange={(e) => handleChange("lastName", e.target.value)}
+                    className="bg-white border-gray-200"
+                />
+                <Input
+                    type="email"
+                    placeholder="Email"
+                    value={contactInfo.email}
+                    onChange={(e) => handleChange("email", e.target.value)}
+                    className="bg-white border-gray-200"
+                />
+                <Input
+                    type="tel"
+                    placeholder="Telefono"
+                    value={contactInfo.phone}
+                    onChange={(e) => handleChange("phone", e.target.value)}
+                    className="bg-white border-gray-200"
+                />
+            </div>
+        </div>
+    );
+}
