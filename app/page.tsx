@@ -7,7 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Heart, AtSign, Phone, CheckCircle2 } from "lucide-react";
 import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { LocationGrid } from "@/components/LocationGrid";
 import { BookingCalendar } from "@/components/BookingCalendar";
 import { ExtrasSelector } from "@/components/ExtrasSelector";
@@ -33,6 +33,17 @@ export default function Home() {
     expYear: "",
     cvv: "",
   });
+
+  const bookingSectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (selectedLocationId && bookingSectionRef.current) {
+      // slight delay to ensure the element is fully rendered and layout is computed
+      setTimeout(() => {
+        bookingSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 100);
+    }
+  }, [selectedLocationId]);
 
   const handleUpdateExtra = (id: string, count: number) => {
     setExtras((prev) => {
@@ -86,7 +97,7 @@ export default function Home() {
                 <Button
                   variant="outline"
                   asChild
-                  className="bg-transparent hover:bg-white/10 text-white border-white/40 hover:border-white rounded-full px-8 h-10 text-xs font-bold tracking-wide uppercase backdrop-blur-sm"
+                  className="bg-transparent hover:bg-white/10 text-white hover:text-white border-white/40 hover:border-white rounded-full px-8 h-10 text-xs font-bold tracking-wide uppercase backdrop-blur-sm cursor-pointer"
                 >
                   <Link href="/catalogo">Ver Catalogo</Link>
                 </Button>
@@ -124,11 +135,13 @@ export default function Home() {
           </div>
           <div className="mt-16 mb-8 flex items-center gap-3">
             <h3 className="text-teal-500 font-bold text-lg">Selecciona tu lugar:</h3>
-            <CheckCircle2 className="h-8 w-8 text-amber-700 stroke-[1.5]" />
           </div>
           <LocationGrid selectedLocationId={selectedLocationId} onSelectLocation={setSelectedLocationId} />
           {selectedLocationId && (
-            <div className="mt-12 animate-in fade-in slide-in-from-bottom-10 duration-700 fill-mode-both">
+            <div
+              ref={bookingSectionRef}
+              className="mt-12 animate-in fade-in slide-in-from-bottom-10 duration-700 fill-mode-both scroll-mt-24"
+            >
 
               <SignedOut>
                 <div className="flex flex-col items-center justify-center py-12 text-center bg-white/50 backdrop-blur-sm rounded-xl border border-white/60 shadow-lg">
