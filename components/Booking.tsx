@@ -37,7 +37,7 @@ export function Booking({ selectedLocationId }: BookingProps) {
   useEffect(() => {
     if (bookingSectionRef.current) {
       setTimeout(() => { bookingSectionRef.current?.scrollIntoView({behavior: "smooth", block: "start"});
-      }, 150);
+      }, 100);
     }
   }, [selectedLocationId]);
 
@@ -66,7 +66,7 @@ export function Booking({ selectedLocationId }: BookingProps) {
             Para continuar con tu reserva y ver los detalles, por favor inicia sesion o registrate.
           </p>
           <SignInButton mode="modal">
-            <Button className="bg-teal-500 hover:bg-teal-600 text-white font-bold px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all">
+            <Button className="bg-teal-500 hover:bg-teal-600 text-white font-bold px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all hover:cursor-pointer">
               Inicia Sesion o Registrate para poder reservar.
             </Button>
           </SignInButton>

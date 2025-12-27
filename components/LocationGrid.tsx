@@ -21,10 +21,10 @@ export function LocationGrid({ selectedLocationId, onSelectLocation }: LocationG
           <Card
             key={location.id}
             className={cn(
-              "cursor-pointer transition-all duration-300 border-2 overflow-hidden group hover:shadow-lg",
+              "cursor-pointer transition-all duration-300 border-2 overflow-hidden group hover:shadow-lg p-0 gap-0",
               isSelected
-              ? "border-teal-500 ring-2 ring-teal-500/20 shadow-md transform scale-[1.02]"
-              : "border-transparent hover:border-gray-200"
+                ? "border-teal-500 ring-2 ring-teal-500/20 shadow-md transform scale-[1.02]"
+                : "border-transparent hover:border-gray-200"
             )}
             onClick={() => onSelectLocation(location.id)}
           >
