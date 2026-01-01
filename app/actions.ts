@@ -3,7 +3,26 @@
 import { writeClient } from "@/sanity/lib/write-client";
 import { revalidatePath } from "next/cache";
 
+
+import { auth, currentUser } from "@clerk/nextjs/server";
+import { getOrCreateCustomer } from "@/lib/actions/customer";
+
 export async function bookProduct(slug: string, date: string) {
+    const { userId } = await auth();
+    const user = await currentUser();
+
+    if (!userId || !user) {
+        return { success: false, error: "Debes iniciar sesión para reservar" };
+    }
+
+    // Ensure customer exists in Sanity
+    const email = user.emailAddresses[0]?.emailAddress;
+    const name = `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim() || email;
+
+    if (email) {
+        await getOrCreateCustomer(email, name, userId);
+    }
+
     try {
         // 1. Find the document ID for the product with the given slug
         const product = await writeClient.fetch(

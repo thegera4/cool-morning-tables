@@ -7,37 +7,40 @@ export const customerType = defineType({
   type: "document",
   icon: UserIcon,
   groups: [
-    { name: "details", title: "Customer Details", default: true },
-    { name: "stripe", title: "Stripe" },
+    { name: "details", title: "Información del Cliente", default: true },
+    { name: "stripe", title: "Información de Stripe" },
   ],
   fields: [
     defineField({
       name: "email",
       type: "string",
       group: "details",
-      validation: (rule) => [rule.required().error("Email is required")],
+      validation: (rule) => [rule.required().error("El email es requerido")],
     }),
     defineField({
       name: "name",
       type: "string",
       group: "details",
-      description: "Customer's full name",
+      description: "Nombre completo del cliente",
+    }),
+    defineField({
+      name: "phone",
+      type: "string",
+      group: "details",
+      description: "Número de teléfono del cliente",
     }),
     defineField({
       name: "clerkUserId",
       type: "string",
       group: "details",
-      description: "Clerk user ID for authentication",
+      description: "ID de Clerk para autenticación",
     }),
     defineField({
       name: "stripeCustomerId",
       type: "string",
       group: "stripe",
       readOnly: true,
-      description: "Stripe customer ID for payments",
-      validation: (rule) => [
-        rule.required().error("Stripe customer ID is required"),
-      ],
+      description: "ID de cliente de Stripe para pagos",
     }),
     defineField({
       name: "createdAt",
@@ -52,13 +55,12 @@ export const customerType = defineType({
       email: "email",
       name: "name",
       stripeCustomerId: "stripeCustomerId",
+      phone: "phone",
     },
-    prepare({ email, name, stripeCustomerId }) {
+    prepare({ email, name, stripeCustomerId, phone }) {
       return {
         title: name ?? email ?? "Unknown Customer",
-        subtitle: stripeCustomerId
-          ? `${email ?? ""} • ${stripeCustomerId}`
-          : (email ?? ""),
+        subtitle: [email, phone, stripeCustomerId].filter(Boolean).join(" • "),
       };
     },
   },

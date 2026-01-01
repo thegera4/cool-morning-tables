@@ -19,6 +19,7 @@ export const metadata: Metadata = {
 };
 
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { SanityUserSync } from "@/components/SanityUserSync";
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
   return (
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <html lang="es">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <TooltipProvider>
+            <SanityUserSync />
             {children}
           </TooltipProvider>
         </body>
