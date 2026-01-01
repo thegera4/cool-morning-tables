@@ -1,14 +1,15 @@
-
 "use client";
 
-import { EXTRAS, Location } from "@/lib/data";
+// import { EXTRAS, Location } from "@/lib/data"; // Exclude legacy EXTRAS
+import { Location } from "@/lib/data";
 import { ContactInfo } from "@/components/ContactForm";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
-import { ListChecks } from "lucide-react";
+import { ListChecks, Minus, Plus } from "lucide-react";
 import { bookProduct } from "@/app/actions";
 import { useTransition } from "react";
+import { ExtraItem } from "@/components/ExtrasSelector";
 
 interface OrderSummaryProps {
     locationId: string | null;
@@ -16,23 +17,40 @@ interface OrderSummaryProps {
     date: Date | undefined;
     time: string | undefined;
     extras: Record<string, number>;
+    extrasData: ExtraItem[]; // New prop for dynamic data
     contactInfo: ContactInfo;
+    onUpdateExtra: (id: string, count: number) => void;
 }
 
-export function OrderSummary({ locationId, location, date, time, extras, contactInfo }: OrderSummaryProps) {
+export function OrderSummary({ locationId, location, date, time, extras, extrasData, contactInfo, onUpdateExtra }: OrderSummaryProps) {
     const selectedLocation = location;
     const [isPending, startTransition] = useTransition();
 
-    // Calculate Totals
     const locationPrice = selectedLocation?.price || 0;
 
+    // Calculate extras total
     const extrasTotal = Object.entries(extras).reduce((total, [id, count]) => {
-        const extra = EXTRAS.find((e) => e.id === id);
+        const extra = extrasData.find((e) => e._id === id); // Use dynamic data
         if (!extra || !extra.price) return total;
         return total + (extra.price * count);
     }, 0);
 
     const total = locationPrice + extrasTotal;
+
+    const handleIncrement = (id: string, current: number) => {
+        onUpdateExtra(id, current + 1);
+    }
+
+    const handleDecrement = (id: string, current: number) => {
+        if (current > 1) {
+            onUpdateExtra(id, current - 1);
+        } else {
+            // If decrementing from 1, maybe confirm removal? Or just remove? 
+            // Normally 0 removes it. But here we are in the "selected" list.
+            // Let's assume hitting minus at 1 removes it (sets to 0).
+            onUpdateExtra(id, 0);
+        }
+    }
 
     const handlePayment = () => {
         if (!locationId || !date) {
@@ -113,11 +131,24 @@ export function OrderSummary({ locationId, location, date, time, extras, contact
                         <h4 className="font-bold text-teal-500 text-xs uppercase tracking-wider">Selecciones:</h4>
                         <div className="space-y-1">
                             {Object.entries(extras).map(([id, count]) => {
-                                const extra = EXTRAS.find(e => e.id === id);
+                                const extra = extrasData.find(e => e._id === id);
                                 if (!extra || count === 0) return null;
                                 return (
-                                    <div key={id} className="flex justify-between font-medium text-gray-700">
-                                        <span>{extra.name} {count > 1 ? `(${count})` : ''}</span>
+                                    <div key={id} className="flex justify-between items-center font-medium text-gray-700">
+                                        <div className="flex items-center gap-2">
+                                            <span>{extra.name}</span>
+                                            {extra.allowQuantity && (
+                                                <div className="flex items-center gap-1 ml-2">
+                                                    <Button variant="outline" size="icon" className="h-5 w-5 rounded-full p-0" onClick={() => handleDecrement(id, count)}>
+                                                        <Minus className="h-3 w-3" />
+                                                    </Button>
+                                                    <span className="text-xs w-4 text-center">{count}</span>
+                                                    <Button variant="outline" size="icon" className="h-5 w-5 rounded-full p-0" onClick={() => handleIncrement(id, count)}>
+                                                        <Plus className="h-3 w-3" />
+                                                    </Button>
+                                                </div>
+                                            )}
+                                        </div>
                                         <span>{extra.price ? `$${extra.price * count}` : '-'}</span>
                                     </div>
                                 );

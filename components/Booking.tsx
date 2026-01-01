@@ -13,15 +13,18 @@ import { client } from "@/sanity/lib/client";
 
 import { Location } from "@/lib/data";
 
+import { ExtraItem } from "@/components/ExtrasSelector";
+
 interface BookingProps {
   selectedLocationId: string;
   location: Location;
+  extrasData: ExtraItem[];
 }
 
-export function Booking({ selectedLocationId, location }: BookingProps) {
+export function Booking({ selectedLocationId, location, extrasData }: BookingProps) {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [time, setTime] = useState<string | undefined>(undefined);
-  const [extras, setExtras] = useState<Record<string, number>>({});
+  const [selectedExtras, setSelectedExtras] = useState<Record<string, number>>({});
   const [blockedDates, setBlockedDates] = useState<Date[]>([]);
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     firstName: "",
@@ -77,7 +80,7 @@ export function Booking({ selectedLocationId, location }: BookingProps) {
 
   /** Updates extras count when a product is selected */
   const handleUpdateExtra = (id: string, count: number) => {
-    setExtras((prev) => {
+    setSelectedExtras((prev) => {
       const newExtras = { ...prev };
       if (count === 0) {
         delete newExtras[id];
@@ -124,14 +127,16 @@ export function Booking({ selectedLocationId, location }: BookingProps) {
           </div>
           {/* Right Column: Extras and Summary */}
           <div className="lg:col-span-5 flex flex-col gap-8 sticky top-8">
-            <ExtrasSelector selectedExtras={extras} onUpdateExtra={handleUpdateExtra} />
+            <ExtrasSelector extras={extrasData} selectedExtras={selectedExtras} onUpdateExtra={handleUpdateExtra} />
             <OrderSummary
               locationId={selectedLocationId}
               location={location}
               date={date}
               time={time}
-              extras={extras}
+              extras={selectedExtras}
+              extrasData={extrasData}
               contactInfo={contactInfo}
+              onUpdateExtra={handleUpdateExtra}
             />
           </div>
         </div>

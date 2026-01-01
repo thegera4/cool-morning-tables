@@ -12,7 +12,7 @@ export function SanityUserSync() {
             createSanityUserAction()
                 .then((data) => {
                     if (data?.sanityCustomerId) {
-                        console.log("Sanity user synced:", data.sanityCustomerId);
+                        console.log("Sanity user synced correctly!");
                     }
                 })
                 .catch((err) => console.error("Sync error:", err));

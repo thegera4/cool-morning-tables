@@ -8,29 +8,38 @@ import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
 import { Booking } from "@/components/Booking";
 import { client } from "@/sanity/lib/client";
+import { ALL_EXTRAS_QUERY } from "@/sanity/queries/extras";
 import { Location } from "@/lib/data";
+import { ExtraItem } from "@/components/ExtrasSelector";
 
 export default function Home() {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
   const [products, setProducts] = useState<Location[]>([]);
+  const [extras, setExtras] = useState<ExtraItem[]>([]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
-        const query = `*[_type == "product"]{
+        const productsQuery = `*[_type == "product"]{
           "id": slug.current,
           name,
           price,
           description,
           "imageUrl": images[0].asset->url
         }`;
-        const result = await client.fetch(query);
-        setProducts(result);
+
+        const [productsResult, extrasResult] = await Promise.all([
+          client.fetch(productsQuery),
+          client.fetch(ALL_EXTRAS_QUERY)
+        ]);
+
+        setProducts(productsResult as Location[]);
+        setExtras(extrasResult as ExtraItem[]);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        console.error("Error fetching data:", error);
       }
     };
-    fetchProducts();
+    fetchData();
   }, []);
 
   const selectedLocation = products.find((p) => p.id === selectedLocationId);
@@ -51,6 +60,7 @@ export default function Home() {
             <Booking
               selectedLocationId={selectedLocationId}
               location={selectedLocation}
+              extrasData={extras}
             />
           )}
         </section>
