@@ -9,14 +9,20 @@ import { PaymentForm, PaymentInfo } from "@/components/PaymentForm";
 import { ExtrasSelector } from "@/components/ExtrasSelector";
 import { OrderSummary } from "@/components/OrderSummary";
 
+import { client } from "@/sanity/lib/client";
+
+import { Location } from "@/lib/data";
+
 interface BookingProps {
   selectedLocationId: string;
+  location: Location;
 }
 
-export function Booking({ selectedLocationId }: BookingProps) {
+export function Booking({ selectedLocationId, location }: BookingProps) {
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [time, setTime] = useState<string | undefined>(undefined);
   const [extras, setExtras] = useState<Record<string, number>>({});
+  const [blockedDates, setBlockedDates] = useState<Date[]>([]);
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     firstName: "",
     lastName: "",
@@ -33,10 +39,38 @@ export function Booking({ selectedLocationId }: BookingProps) {
 
   const bookingSectionRef = useRef<HTMLDivElement>(null);
 
+  // Fetch blocked dates when selectedLocationId changes
+  useEffect(() => {
+    const fetchBlockedDates = async () => {
+      if (!selectedLocationId) return;
+      try {
+        const query = `*[_type == "product" && slug.current == $slug][0].blockedDates`;
+        const result = await client.fetch(query, { slug: selectedLocationId });
+        if (result) {
+          // Strings to Date objects (handling timezone issues by splitting or just new Date)
+          // Sanity stores dates as YYYY-MM-DD strings usually if type is 'date'
+          // new Date("YYYY-MM-DD") creates UTC midnight.
+          // We need to ensure comparisons match.
+          // Let's assume standard Date object usage for now.
+          setBlockedDates(result.map((d: string) => {
+            const [year, month, day] = d.split('-').map(Number);
+            return new Date(year, month - 1, day);
+          }));
+        } else {
+          setBlockedDates([]);
+        }
+      } catch (error) {
+        console.error("Error fetching blocked dates:", error);
+      }
+    };
+    fetchBlockedDates();
+  }, [selectedLocationId]);
+
   // Auto-scroll to booking section when mounted (which happens when location is selected)
   useEffect(() => {
     if (bookingSectionRef.current) {
-      setTimeout(() => { bookingSectionRef.current?.scrollIntoView({behavior: "smooth", block: "start"});
+      setTimeout(() => {
+        bookingSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 100);
     }
   }, [selectedLocationId]);
@@ -59,6 +93,7 @@ export function Booking({ selectedLocationId }: BookingProps) {
       ref={bookingSectionRef}
       className="mt-12 animate-in fade-in slide-in-from-bottom-10 duration-700 fill-mode-both scroll-mt-24"
     >
+      {/* If user is not signed in, show sign in message and button */}
       <SignedOut>
         <div className="flex flex-col items-center justify-center py-12 text-center bg-white/50 backdrop-blur-sm rounded-xl border border-white/60 shadow-lg">
           <h3 className="text-2xl font-bold text-teal-600 mb-4">¡Casi listo para reservar!</h3>
@@ -72,11 +107,18 @@ export function Booking({ selectedLocationId }: BookingProps) {
           </SignInButton>
         </div>
       </SignedOut>
+      {/* If user is signed in, show booking form */}
       <SignedIn>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Column: Form Steps */}
           <div className="lg:col-span-7 flex flex-col gap-8">
-            <BookingCalendar date={date} setDate={setDate} time={time} setTime={setTime} />
+            <BookingCalendar
+              date={date}
+              setDate={setDate}
+              time={time}
+              setTime={setTime}
+              blockedDates={blockedDates}
+            />
             <ContactForm contactInfo={contactInfo} setContactInfo={setContactInfo} />
             <PaymentForm paymentInfo={paymentInfo} setPaymentInfo={setPaymentInfo} />
           </div>
@@ -85,6 +127,7 @@ export function Booking({ selectedLocationId }: BookingProps) {
             <ExtrasSelector selectedExtras={extras} onUpdateExtra={handleUpdateExtra} />
             <OrderSummary
               locationId={selectedLocationId}
+              location={location}
               date={date}
               time={time}
               extras={extras}

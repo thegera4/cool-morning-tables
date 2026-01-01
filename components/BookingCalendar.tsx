@@ -1,20 +1,61 @@
 "use client";
 
-import { addMonths, startOfToday } from "date-fns";
+import { addMonths, startOfToday, isSameDay } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import { es } from "date-fns/locale";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { DayButtonProps } from "react-day-picker";
 
 interface BookingCalendarProps {
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
   time: string | undefined;
   setTime: (time: string) => void;
+  blockedDates: Date[];
 }
 
-export function BookingCalendar({ date, setDate }: BookingCalendarProps) {
+export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendarProps) {
   const today = startOfToday();
   const maxDate = addMonths(today, 1);
+
+  const CustomDayButton = (props: DayButtonProps) => {
+    const { day, modifiers } = props;
+    const isBlocked = blockedDates.some((blocked) => isSameDay(day.date, blocked));
+
+    if (isBlocked) {
+      return (
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span tabIndex={0} className="w-full h-full"> {/* Wrap in span to ensure tooltip triggers on disabled button if needed, though pointer-events might block it. shadcn disabled buttons have pointer-events-none usually. */}
+              {/* actually, strict disabled buttons don't fire events. We might need to render a non-disabled looking button or wrap it specifically. 
+                   However, CalendarDayButton renders a Button which might have disabled={true}. 
+                   If disabled, it has opacity-50 and pointer-events-none.
+                   To show tooltip, we need pointer-events-auto on a wrapper or remove pointer-events-none from the button for this specific case.
+                   Let's try wrapping. If button has pointer-events-none, the wrapper catches it? No, needs to be on wrapper.
+                   Actually simpler: Render the button but override className to allow pointer events for the tooltip? 
+                   Or better: Rendering a disabled button often swallows events.
+               */}
+              {/* Let's try wrapping CalendarDayButton. Note: spread props to it. */}
+              <div className="w-full h-full cursor-not-allowed">
+                <CalendarDayButton {...props} />
+              </div>
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>No Disponible</p>
+          </TooltipContent>
+        </Tooltip>
+      );
+
+    }
+    return <CalendarDayButton {...props} />;
+  };
 
   return (
     <div className="flex flex-col gap-6 p-6 bg-white rounded-lg shadow-sm border border-gray-100">
@@ -41,10 +82,13 @@ export function BookingCalendar({ date, setDate }: BookingCalendarProps) {
               day_selected: "bg-teal-500 text-white hover:bg-teal-600 hover:text-white focus:bg-teal-500 focus:text-white rounded-md",
               day_today: "bg-gray-100 text-gray-900 border border-gray-200",
             }}
-            disabled={(date) => date < today || date > maxDate}
-            hidden={{before: today, after: maxDate}}
+            disabled={(date) => date < today || date > maxDate || blockedDates.some(blocked => isSameDay(date, blocked))}
+            hidden={{ before: today, after: maxDate }}
             autoFocus
             locale={es}
+            components={{
+              DayButton: CustomDayButton,
+            }}
           />
         </div>
       </div>

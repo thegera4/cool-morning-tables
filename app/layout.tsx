@@ -18,12 +18,16 @@ export const metadata: Metadata = {
   description: "Experiencia Cool Morning en columpios con cena incluida",
 };
 
+import { TooltipProvider } from "@/components/ui/tooltip";
+
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
   return (
     <ClerkProvider>
       <html lang="es">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          {children}
+          <TooltipProvider>
+            {children}
+          </TooltipProvider>
         </body>
       </html>
     </ClerkProvider>

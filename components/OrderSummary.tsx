@@ -1,23 +1,27 @@
 
 "use client";
 
-import { LOCATIONS, EXTRAS, Location } from "@/lib/data";
+import { EXTRAS, Location } from "@/lib/data";
 import { ContactInfo } from "@/components/ContactForm";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { ListChecks } from "lucide-react";
+import { bookProduct } from "@/app/actions";
+import { useTransition } from "react";
 
 interface OrderSummaryProps {
     locationId: string | null;
+    location: Location;
     date: Date | undefined;
     time: string | undefined;
     extras: Record<string, number>;
     contactInfo: ContactInfo;
 }
 
-export function OrderSummary({ locationId, date, time, extras, contactInfo }: OrderSummaryProps) {
-    const selectedLocation = LOCATIONS.find((l) => l.id === locationId);
+export function OrderSummary({ locationId, location, date, time, extras, contactInfo }: OrderSummaryProps) {
+    const selectedLocation = location;
+    const [isPending, startTransition] = useTransition();
 
     // Calculate Totals
     const locationPrice = selectedLocation?.price || 0;
@@ -29,6 +33,26 @@ export function OrderSummary({ locationId, date, time, extras, contactInfo }: Or
     }, 0);
 
     const total = locationPrice + extrasTotal;
+
+    const handlePayment = () => {
+        if (!locationId || !date) {
+            alert("Por favor selecciona una fecha.");
+            return;
+        }
+
+        startTransition(async () => {
+            const formattedDate = format(date, "yyyy-MM-dd");
+            const result = await bookProduct(locationId, formattedDate);
+
+            if (result.success) {
+                alert("¡Reserva confirmada! La fecha se ha bloqueado.");
+                // Optionally redirect or reset
+                window.location.reload(); // Simple reload to refresh state for now
+            } else {
+                alert("Hubo un error al procesar la reserva. Intenta de nuevo.");
+            }
+        });
+    };
 
     if (!selectedLocation && !date && Object.keys(extras).length === 0) {
         return (
@@ -109,8 +133,12 @@ export function OrderSummary({ locationId, date, time, extras, contactInfo }: Or
                     <span className="font-bold text-xl text-gray-900">${total} mxn</span>
                 </div>
 
-                <Button className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold h-12 text-base shadow-lg shadow-teal-500/20">
-                    Pagar
+                <Button
+                    onClick={handlePayment}
+                    disabled={isPending || !date}
+                    className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold h-12 text-base shadow-lg shadow-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {isPending ? "Procesando..." : "Pagar"}
                 </Button>
             </div>
         </div>

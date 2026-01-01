@@ -2,7 +2,7 @@
 "use client";
 
 import Image from "next/image";
-import { LOCATIONS } from "@/lib/data";
+import { Location } from "@/lib/data";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -10,12 +10,13 @@ import { cn } from "@/lib/utils";
 interface LocationGridProps {
   selectedLocationId: string | null;
   onSelectLocation: (id: string) => void;
+  products: Location[];
 }
 
-export function LocationGrid({ selectedLocationId, onSelectLocation }: LocationGridProps) {
+export function LocationGrid({ selectedLocationId, onSelectLocation, products }: LocationGridProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-      {LOCATIONS.map((location) => {
+      {products.map((location) => {
         const isSelected = selectedLocationId === location.id;
         return (
           <Card
