@@ -24,8 +24,8 @@ import { SanityUserSync } from "@/components/SanityUserSync";
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
   return (
     <ClerkProvider>
-      <html lang="es">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <html lang="es" suppressHydrationWarning>
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
           <TooltipProvider>
             <SanityUserSync />
             {children}

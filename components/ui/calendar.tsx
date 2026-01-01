@@ -187,6 +187,10 @@ function CalendarDayButton({
 }: React.ComponentProps<typeof DayButton>) {
   const defaultClassNames = getDefaultClassNames()
 
+  // Extract disableTransition to prevent React warning
+  // @ts-ignore
+  const { disableTransition, ...rest } = props;
+
   const ref = React.useRef<HTMLButtonElement>(null)
   React.useEffect(() => {
     if (modifiers.focused) ref.current?.focus()
@@ -212,7 +216,7 @@ function CalendarDayButton({
         defaultClassNames.day,
         className
       )}
-      {...props}
+      {...rest}
     />
   )
 }

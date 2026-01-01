@@ -1,6 +1,5 @@
 "use client";
 
-// import { EXTRAS, Location } from "@/lib/data"; // Exclude legacy EXTRAS
 import { Location } from "@/lib/data";
 import { ContactInfo } from "@/components/ContactForm";
 import { format } from "date-fns";
@@ -17,7 +16,7 @@ interface OrderSummaryProps {
     date: Date | undefined;
     time: string | undefined;
     extras: Record<string, number>;
-    extrasData: ExtraItem[]; // New prop for dynamic data
+    extrasData: ExtraItem[];
     contactInfo: ContactInfo;
     onUpdateExtra: (id: string, count: number) => void;
 }
@@ -30,7 +29,7 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
 
     // Calculate extras total
     const extrasTotal = Object.entries(extras).reduce((total, [id, count]) => {
-        const extra = extrasData.find((e) => e._id === id); // Use dynamic data
+        const extra = extrasData.find((e) => e._id === id);
         if (!extra || !extra.price) return total;
         return total + (extra.price * count);
     }, 0);
@@ -38,19 +37,12 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
     const total = locationPrice + extrasTotal;
 
     const handleIncrement = (id: string, current: number) => {
-        onUpdateExtra(id, current + 1);
-    }
-
-    const handleDecrement = (id: string, current: number) => {
-        if (current > 1) {
-            onUpdateExtra(id, current - 1);
-        } else {
-            // If decrementing from 1, maybe confirm removal? Or just remove? 
-            // Normally 0 removes it. But here we are in the "selected" list.
-            // Let's assume hitting minus at 1 removes it (sets to 0).
-            onUpdateExtra(id, 0);
+        if (current < 10) {
+            onUpdateExtra(id, current + 1);
         }
-    }
+    };
+
+    const handleDecrement = (id: string, current: number) => current > 1 ? onUpdateExtra(id, current - 1) : onUpdateExtra(id, 0);
 
     const handlePayment = () => {
         if (!locationId || !date) {
@@ -86,9 +78,7 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                 <ListChecks className="h-6 w-6 text-amber-700 stroke-[1.5]" />
                 <h3 className="text-teal-500 font-bold text-lg">Resumen y Confirmacion</h3>
             </div>
-
             <div className="space-y-6 flex-1 text-sm text-gray-800">
-
                 {/* Date & Time */}
                 {(date || time) && (
                     <div className="space-y-1">
@@ -99,7 +89,6 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                         </p>
                     </div>
                 )}
-
                 {/* Contact Info */}
                 {(contactInfo.firstName || contactInfo.lastName || contactInfo.email || contactInfo.phone) && (
                     <div className="space-y-1">
@@ -109,7 +98,6 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                         {contactInfo.phone && <p className="font-medium text-gray-600">{contactInfo.phone}</p>}
                     </div>
                 )}
-
                 {/* Location */}
                 {selectedLocation && (
                     <div className="space-y-1">
@@ -124,7 +112,6 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                         <p className="font-medium text-gray-600">Torreon, Coahuila</p>
                     </div>
                 )}
-
                 {/* Selected Extras */}
                 {Object.keys(extras).length > 0 && (
                     <div className="space-y-1">
@@ -139,11 +126,11 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                                             <span>{extra.name}</span>
                                             {extra.allowQuantity && (
                                                 <div className="flex items-center gap-1 ml-2">
-                                                    <Button variant="outline" size="icon" className="h-5 w-5 rounded-full p-0" onClick={() => handleDecrement(id, count)}>
+                                                    <Button variant="outline" size="icon" className="h-5 w-5 rounded-full p-0 hover:cursor-pointer" onClick={() => handleDecrement(id, count)}>
                                                         <Minus className="h-3 w-3" />
                                                     </Button>
                                                     <span className="text-xs w-4 text-center">{count}</span>
-                                                    <Button variant="outline" size="icon" className="h-5 w-5 rounded-full p-0" onClick={() => handleIncrement(id, count)}>
+                                                    <Button variant="outline" size="icon" className="h-5 w-5 rounded-full p-0 hover:cursor-pointer" onClick={() => handleIncrement(id, count)} disabled={count >= 10}>
                                                         <Plus className="h-3 w-3" />
                                                     </Button>
                                                 </div>
@@ -157,17 +144,15 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                     </div>
                 )}
             </div>
-
             <div className="mt-8 pt-4 border-t border-gray-100">
                 <div className="flex justify-between items-center mb-6">
                     <h4 className="font-bold text-teal-500 text-lg">Total:</h4>
                     <span className="font-bold text-xl text-gray-900">${total} mxn</span>
                 </div>
-
                 <Button
                     onClick={handlePayment}
                     disabled={isPending || !date}
-                    className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold h-12 text-base shadow-lg shadow-teal-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold h-12 text-base shadow-lg shadow-teal-500/20 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isPending ? "Procesando..." : "Pagar"}
                 </Button>

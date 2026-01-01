@@ -3,7 +3,7 @@ import { LayersPlus, PackageIcon } from "lucide-react";
 
 export const extraType = defineType({
     name: "extra",
-    title: "Extra",
+    title: "Extras",
     type: "document",
     icon: LayersPlus,
     fields: [

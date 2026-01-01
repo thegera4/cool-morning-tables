@@ -4,11 +4,11 @@ import { ORDER_STATUS_SANITY_LIST } from "@/lib/constants/orderStatus";
 
 export const orderType = defineType({
   name: "order",
-  title: "Order",
+  title: "Ordenes",
   type: "document",
   icon: BasketIcon,
   groups: [
-    { name: "details", title: "Order Details", default: true },
+    { name: "details", title: "Detalles", default: true },
     { name: "customer", title: "Customer" },
     { name: "payment", title: "Payment" },
   ],
@@ -18,7 +18,7 @@ export const orderType = defineType({
       type: "string",
       group: "details",
       readOnly: true,
-      validation: (rule) => [rule.required().error("Order number is required")],
+      validation: (rule) => [rule.required().error("El numero de orden es requerido")],
     }),
     defineField({
       name: "items",
@@ -101,19 +101,6 @@ export const orderType = defineType({
       type: "string",
       group: "customer",
       readOnly: true,
-    }),
-    defineField({
-      name: "address",
-      type: "object",
-      group: "customer",
-      fields: [
-        defineField({ name: "name", type: "string", title: "Full Name" }),
-        defineField({ name: "line1", type: "string", title: "Address Line 1" }),
-        defineField({ name: "line2", type: "string", title: "Address Line 2" }),
-        defineField({ name: "city", type: "string" }),
-        defineField({ name: "postcode", type: "string", title: "Postcode" }),
-        defineField({ name: "country", type: "string" }),
-      ],
     }),
     defineField({
       name: "stripePaymentId",
