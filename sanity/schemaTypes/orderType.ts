@@ -22,6 +22,12 @@ export const orderType = defineType({
       validation: (rule) => [rule.required().error("El número de orden es requerido")],
     }),
     defineField({
+      name: "reservationDate",
+      type: "date",
+      title: "Fecha de reservación",
+      group: "details"
+    }),
+    defineField({
       name: "items",
       type: "array",
       title: "Detalle de las selecciones incluidas en la orden",

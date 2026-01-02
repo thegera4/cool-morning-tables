@@ -150,6 +150,7 @@ export async function createOrder({ locationId, date, extras, contactInfo, payDe
       amountPending: payDeposit ? total / 2 : 0,
       status: payDeposit ? "deposito" : "pagada", // Using new status "deposito" for 50%
       createdAt: new Date().toISOString(),
+      reservationDate: date,
     });
 
     // 6. Block Date on Product (Location)
