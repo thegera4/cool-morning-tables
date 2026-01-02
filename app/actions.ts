@@ -136,7 +136,7 @@ export async function createOrder({ locationId, date, extras, contactInfo, payDe
     });
 
     // 5. Create Order
-    const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+    const orderNumber = `ORD-${crypto.randomUUID()}`;
 
     await writeClient.create({
       _type: "order",
