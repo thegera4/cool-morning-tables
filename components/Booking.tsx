@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import { SignInButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { BookingCalendar } from "@/components/BookingCalendar";
 import { ContactForm, ContactInfo } from "@/components/ContactForm";
 import { PaymentForm, PaymentInfo } from "@/components/PaymentForm";
@@ -22,6 +22,7 @@ interface BookingProps {
 }
 
 export function Booking({ selectedLocationId, location, extrasData }: BookingProps) {
+  const { user } = useUser();
   const [date, setDate] = useState<Date | undefined>(undefined);
   const [time, setTime] = useState<string | undefined>(undefined);
   const [selectedExtras, setSelectedExtras] = useState<Record<string, number>>({});
@@ -39,6 +40,18 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
     expYear: "",
     cvv: "",
   });
+
+  // Prefill contact info from Clerk user
+  useEffect(() => {
+    if (user) {
+      setContactInfo((prev) => ({
+        ...prev,
+        firstName: prev.firstName || user.firstName || "",
+        lastName: prev.lastName || user.lastName || "",
+        email: prev.email || user.primaryEmailAddress?.emailAddress || "",
+      }));
+    }
+  }, [user]);
 
   const bookingSectionRef = useRef<HTMLDivElement>(null);
 
@@ -136,6 +149,7 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
               extras={selectedExtras}
               extrasData={extrasData}
               contactInfo={contactInfo}
+              paymentInfo={paymentInfo}
               onUpdateExtra={handleUpdateExtra}
             />
           </div>

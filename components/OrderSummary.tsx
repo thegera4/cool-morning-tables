@@ -9,6 +9,7 @@ import { ListChecks, Minus, Plus } from "lucide-react";
 import { bookProduct } from "@/app/actions";
 import { useTransition } from "react";
 import { ExtraItem } from "@/components/ExtrasSelector";
+import { PaymentInfo } from "@/components/PaymentForm";
 
 interface OrderSummaryProps {
     locationId: string | null;
@@ -18,10 +19,11 @@ interface OrderSummaryProps {
     extras: Record<string, number>;
     extrasData: ExtraItem[];
     contactInfo: ContactInfo;
+    paymentInfo: PaymentInfo;
     onUpdateExtra: (id: string, count: number) => void;
 }
 
-export function OrderSummary({ locationId, location, date, time, extras, extrasData, contactInfo, onUpdateExtra }: OrderSummaryProps) {
+export function OrderSummary({ locationId, location, date, time, extras, extrasData, contactInfo, paymentInfo, onUpdateExtra }: OrderSummaryProps) {
     const selectedLocation = location;
     const [isPending, startTransition] = useTransition();
 
@@ -37,18 +39,27 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
     const total = locationPrice + extrasTotal;
 
     const handleIncrement = (id: string, current: number) => {
-        if (current < 10) {
-            onUpdateExtra(id, current + 1);
-        }
+        if (current < 10) { onUpdateExtra(id, current + 1); }
     };
 
     const handleDecrement = (id: string, current: number) => current > 1 ? onUpdateExtra(id, current - 1) : onUpdateExtra(id, 0);
 
+    // Validations for Checkout button
+    const isContactInfoComplete = contactInfo.firstName && contactInfo.lastName && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactInfo.email) && contactInfo.phone.replace(/\D/g, "").length === 10;
+    const isPaymentInfoComplete = paymentInfo.cardName && paymentInfo.cardNumber.length === 16 && paymentInfo.expMonth.length === 2 && paymentInfo.expYear.length === 2 && paymentInfo.cvv.length === 3;
+    const isValid = locationId && date && isContactInfoComplete && isPaymentInfoComplete;
+
+    // Show empty state if no location, date, or extras
+    if (!selectedLocation && !date && Object.keys(extras).length === 0) {
+        return (
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-full flex items-center justify-center text-gray-400 text-sm italic">
+                Selecciona un lugar y fecha para ver el resumen
+            </div>
+        );
+    }
+
     const handlePayment = () => {
-        if (!locationId || !date) {
-            alert("Por favor selecciona una fecha.");
-            return;
-        }
+        if (!isValid || !locationId || !date) { return; }
 
         startTransition(async () => {
             const formattedDate = format(date, "yyyy-MM-dd");
@@ -64,16 +75,9 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
         });
     };
 
-    if (!selectedLocation && !date && Object.keys(extras).length === 0) {
-        return (
-            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-full flex items-center justify-center text-gray-400 text-sm italic">
-                Selecciona un lugar y fecha para ver el resumen
-            </div>
-        );
-    }
-
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-full flex flex-col">
+            {/* Header Title*/}
             <div className="flex items-center gap-3 mb-6">
                 <ListChecks className="h-6 w-6 text-amber-700 stroke-[1.5]" />
                 <h3 className="text-teal-500 font-bold text-lg">Resumen y Confirmacion</h3>
@@ -144,18 +148,27 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                     </div>
                 )}
             </div>
+            {/* Total, Checkout Button and Warning Messages Section */}
             <div className="mt-8 pt-4 border-t border-gray-100">
+                {/* Total */}
                 <div className="flex justify-between items-center mb-6">
                     <h4 className="font-bold text-teal-500 text-lg">Total:</h4>
                     <span className="font-bold text-xl text-gray-900">${total} mxn</span>
                 </div>
+                {/* Checkout Button */}
                 <Button
                     onClick={handlePayment}
-                    disabled={isPending || !date}
+                    disabled={isPending || !isValid}
                     className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold h-12 text-base shadow-lg shadow-teal-500/20 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isPending ? "Procesando..." : "Pagar"}
                 </Button>
+                {/* Warning messages for missing required fields */}
+                <div className="mt-3 space-y-1">
+                    {!date && <p className="text-xs text-amber-600 font-medium flex items-center gap-1">⚠️ Por favor selecciona una fecha</p>}
+                    {!isContactInfoComplete && <p className="text-xs text-amber-600 font-medium flex items-center gap-1">⚠️ Información de contacto incompleta</p>}
+                    {!isPaymentInfoComplete && <p className="text-xs text-amber-600 font-medium flex items-center gap-1">⚠️ Información de pago incompleta</p>}
+                </div>
             </div>
         </div>
     );
