@@ -28,6 +28,12 @@ export function PaymentForm({ paymentInfo, setPaymentInfo }: PaymentFormProps) {
         }
     };
 
+    const handleNameChange = (value: string) => {
+        if (/^[a-zA-Z\s\u00C0-\u00FF]*$/.test(value)) {
+            setPaymentInfo({ ...paymentInfo, cardName: value });
+        }
+    };
+
     return (
         <div className="flex flex-col gap-6 p-6 bg-white rounded-lg shadow-sm border border-gray-100 h-full">
             <div className="flex items-center gap-3 mb-2">
@@ -39,7 +45,7 @@ export function PaymentForm({ paymentInfo, setPaymentInfo }: PaymentFormProps) {
                 <Input
                     placeholder="Nombre en tarjeta"
                     value={paymentInfo.cardName}
-                    onChange={(e) => handleChange("cardName", e.target.value)}
+                    onChange={(e) => handleNameChange(e.target.value)}
                     className="bg-white border-gray-200"
                 />
                 <Input
