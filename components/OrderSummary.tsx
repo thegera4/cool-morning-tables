@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { ListChecks, Minus, Plus } from "lucide-react";
-import { bookProduct } from "@/app/actions";
+import { createOrder } from "@/app/actions";
 import { useTransition } from "react";
 import { ExtraItem } from "@/components/ExtrasSelector";
 import { PaymentInfo } from "@/components/PaymentForm";
@@ -46,7 +46,7 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
 
     // Validations for Checkout button
     const isContactInfoComplete = contactInfo.firstName && contactInfo.lastName && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactInfo.email) && contactInfo.phone.replace(/\D/g, "").length === 10;
-    const isPaymentInfoComplete = paymentInfo.cardName && paymentInfo.cardNumber.length === 16 && paymentInfo.expMonth.length === 2 && paymentInfo.expYear.length === 2 && paymentInfo.cvv.length === 3;
+    const isPaymentInfoComplete = paymentInfo.cardName && paymentInfo.cardNumber.length === 19 && paymentInfo.expMonth.length === 2 && paymentInfo.expYear.length === 2 && paymentInfo.cvv.length === 3;
     const isValid = locationId && date && isContactInfoComplete && isPaymentInfoComplete;
 
     // Show empty state if no location, date, or extras
@@ -63,10 +63,15 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
 
         startTransition(async () => {
             const formattedDate = format(date, "yyyy-MM-dd");
-            const result = await bookProduct(locationId, formattedDate);
+            const result = await createOrder({
+                locationId,
+                date: formattedDate,
+                extras,
+                contactInfo
+            });
 
             if (result.success) {
-                alert("¡Reserva confirmada! La fecha se ha bloqueado.");
+                alert(`¡Orden creada! ID: ${result.orderNumber}. La fecha se ha bloqueado.`);
                 // Optionally redirect or reset
                 window.location.reload(); // Simple reload to refresh state for now
             } else {

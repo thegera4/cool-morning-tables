@@ -9,8 +9,8 @@ export const orderType = defineType({
   icon: BasketIcon,
   groups: [
     { name: "details", title: "Detalles", default: true },
-    { name: "customer", title: "Customer" },
-    { name: "payment", title: "Payment" },
+    { name: "customer", title: "Cliente" },
+    { name: "payment", title: "Pago" },
   ],
   fields: [
     defineField({
@@ -31,7 +31,7 @@ export const orderType = defineType({
             defineField({
               name: "product",
               type: "reference",
-              to: [{ type: "product" }],
+              to: [{ type: "product" }, { type: "extra" }],
               validation: (rule) => rule.required(),
             }),
             defineField({
