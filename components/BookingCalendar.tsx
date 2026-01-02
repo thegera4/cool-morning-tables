@@ -4,11 +4,7 @@ import { addMonths, startOfToday, isSameDay, startOfTomorrow } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import { es } from "date-fns/locale";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { DayButtonProps } from "react-day-picker";
 
 interface BookingCalendarProps {
@@ -26,7 +22,7 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
   const maxDate = addMonths(today, 1);
 
   const CustomDayButton = (props: DayButtonProps) => {
-    const { day, modifiers } = props;
+    const { day } = props;
     const isBlocked = blockedDates.some((blocked) => isSameDay(day.date, blocked)) || day.date.getDay() === 1;
 
     if (isBlocked) {
@@ -34,14 +30,10 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
         <Tooltip>
           <TooltipTrigger asChild>
             <span tabIndex={0} className="w-full h-full">
-              <div className="w-full h-full cursor-not-allowed">
-                <CalendarDayButton {...props} />
-              </div>
+              <div className="w-full h-full cursor-not-allowed"><CalendarDayButton {...props}/></div>
             </span>
           </TooltipTrigger>
-          <TooltipContent>
-            <p>No Disponible</p>
-          </TooltipContent>
+          <TooltipContent><p>No Disponible</p></TooltipContent>
         </Tooltip>
       );
     }
