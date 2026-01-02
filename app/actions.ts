@@ -63,6 +63,7 @@ interface CreateOrderParams {
     email: string;
     phone: string;
   };
+  payDeposit?: boolean;
 }
 
 /*
@@ -70,7 +71,7 @@ interface CreateOrderParams {
   * @param {CreateOrderParams} params - The order parameters (locationId, date, extras, contactInfo).
   * @returns {Promise<{ success: boolean; error?: string; orderNumber?: string }>} - The result of the order creation.
 */
-export async function createOrder({ locationId, date, extras, contactInfo }: CreateOrderParams) {
+export async function createOrder({ locationId, date, extras, contactInfo, payDeposit }: CreateOrderParams) {
   const { userId } = await auth();
   const user = await currentUser();
 
@@ -145,7 +146,9 @@ export async function createOrder({ locationId, date, extras, contactInfo }: Cre
       email,
       items: orderItems,
       total,
-      status: "paid", // Mocking payment as successful
+      amountPaid: payDeposit ? total / 2 : total,
+      amountPending: payDeposit ? total / 2 : 0,
+      status: payDeposit ? "deposito" : "pagada", // Using new status "deposito" for 50%
       createdAt: new Date().toISOString(),
     });
 

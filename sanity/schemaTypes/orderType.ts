@@ -1,6 +1,6 @@
 import { BasketIcon } from "@sanity/icons";
 import { defineArrayMember, defineField, defineType } from "sanity";
-import { ORDER_STATUS_SANITY_LIST } from "@/lib/constants/orderStatus";
+import { ORDER_STATUS_SANITY_LIST, getOrderStatus } from "@/lib/constants/orderStatus";
 
 export const orderType = defineType({
   name: "order",
@@ -16,13 +16,15 @@ export const orderType = defineType({
     defineField({
       name: "orderNumber",
       type: "string",
+      title: "Número de Orden",
       group: "details",
       readOnly: true,
-      validation: (rule) => [rule.required().error("El numero de orden es requerido")],
+      validation: (rule) => [rule.required().error("El número de orden es requerido")],
     }),
     defineField({
       name: "items",
       type: "array",
+      title: "Detalle de las selecciones incluidas en la orden",
       group: "details",
       of: [
         defineArrayMember({
@@ -31,19 +33,21 @@ export const orderType = defineType({
             defineField({
               name: "product",
               type: "reference",
+              title: "Producto",
               to: [{ type: "product" }, { type: "extra" }],
               validation: (rule) => rule.required(),
             }),
             defineField({
               name: "quantity",
               type: "number",
+              title: "Cantidad",
               initialValue: 1,
               validation: (rule) => rule.required().min(1),
             }),
             defineField({
               name: "priceAtPurchase",
               type: "number",
-              description: "Price at time of purchase",
+              title: "Precio",
               validation: (rule) => rule.required(),
             }),
           ],
@@ -57,7 +61,7 @@ export const orderType = defineType({
             prepare({ title, quantity, price, media }) {
               return {
                 title: title ?? "Product",
-                subtitle: `Qty: ${quantity} • $${price}`,
+                subtitle: `Cantidad: ${quantity} • $${price}`,
                 media,
               };
             },
@@ -68,15 +72,29 @@ export const orderType = defineType({
     defineField({
       name: "total",
       type: "number",
+      title: "Total de la orden en MXN",
       group: "details",
+      readOnly: true
+    }),
+    defineField({
+      name: "amountPaid",
+      type: "number",
+      title: "Cantidad pagada por el cliente en la web",
+      group: "payment"
+    }),
+    defineField({
+      name: "amountPending",
+      type: "number",
+      title: "Cantidad pendiente a pagar (2 días antes de la reserva)",
+      group: "payment",
       readOnly: true,
-      description: "Total order amount in GBP",
+      initialValue: (value) => value.total - value.amountPaid
     }),
     defineField({
       name: "status",
       type: "string",
       group: "details",
-      initialValue: "paid",
+      initialValue: "Pagada",
       options: {
         list: ORDER_STATUS_SANITY_LIST,
         layout: "radio",
@@ -85,33 +103,34 @@ export const orderType = defineType({
     defineField({
       name: "customer",
       type: "reference",
+      title: "Información del cliente",
       to: [{ type: "customer" }],
-      group: "customer",
-      description: "Reference to the customer record",
+      group: "customer"
     }),
     defineField({
       name: "clerkUserId",
       type: "string",
+      title: "ID de usuario en Clerk",
       group: "customer",
-      readOnly: true,
-      description: "Clerk user ID",
+      readOnly: true
     }),
     defineField({
       name: "email",
       type: "string",
       group: "customer",
-      readOnly: true,
+      readOnly: true
     }),
     defineField({
       name: "stripePaymentId",
       type: "string",
+      title: "ID de pago en Stripe",
       group: "payment",
-      readOnly: true,
-      description: "Stripe payment intent ID",
+      readOnly: true
     }),
     defineField({
       name: "createdAt",
       type: "datetime",
+      title: "Fecha de creación de la orden",
       group: "details",
       readOnly: true,
       initialValue: () => new Date().toISOString(),
@@ -125,9 +144,10 @@ export const orderType = defineType({
       status: "status",
     },
     prepare({ orderNumber, email, total, status }) {
+      const statusLabel = getOrderStatus(status).label;
       return {
         title: `Order ${orderNumber ?? "N/A"}`,
-        subtitle: `${email ?? "No email"} • $${total ?? 0} • ${status ?? "paid"}`,
+        subtitle: `$${total ?? 0} • ${statusLabel}`,
       };
     },
   },

@@ -1,6 +1,6 @@
-import {Package, Truck, XCircle, CreditCard, type LucideIcon,} from "lucide-react";
+import { Package, Truck, XCircle, CreditCard, type LucideIcon, } from "lucide-react";
 
-export type OrderStatusValue = "pagada" | "terminada" | "cancelada";
+export type OrderStatusValue = "pagada" | "terminada" | "cancelada" | "deposito";
 
 export interface OrderStatusConfig {
   /** The status value/key */
@@ -20,35 +20,44 @@ export interface OrderStatusConfig {
 }
 
 export const ORDER_STATUS_CONFIG: Record<OrderStatusValue, OrderStatusConfig> =
-  {
-    pagada: {
-      value: "pagada",
-      label: "Pagada",
-      color: "bg-green-100 text-green-800",
-      icon: CreditCard,
-      emoji: "✅",
-      iconColor: "text-emerald-600 dark:text-emerald-400",
-      iconBgColor: "bg-emerald-100 dark:bg-emerald-900/30",
-    },
-    terminada: {
-      value: "terminada",
-      label: "Terminada",
-      color: "bg-blue-100 text-blue-800",
-      icon: Package,
-      emoji: "🎉",
-      iconColor: "text-emerald-600 dark:text-emerald-400",
-      iconBgColor: "bg-emerald-100 dark:bg-emerald-900/30",
-    },
-    cancelada: {
-      value: "cancelada",
-      label: "Cancelada",
-      color: "bg-red-100 text-red-800",
-      icon: XCircle,
-      emoji: "❌",
-      iconColor: "text-red-600 dark:text-red-400",
-      iconBgColor: "bg-red-100 dark:bg-red-900/30",
-    },
-  };
+{
+  pagada: {
+    value: "pagada",
+    label: "Pagada",
+    color: "bg-green-100 text-green-800",
+    icon: CreditCard,
+    emoji: "✅",
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    iconBgColor: "bg-emerald-100 dark:bg-emerald-900/30",
+  },
+  terminada: {
+    value: "terminada",
+    label: "Terminada",
+    color: "bg-blue-100 text-blue-800",
+    icon: Package,
+    emoji: "🎉",
+    iconColor: "text-emerald-600 dark:text-emerald-400",
+    iconBgColor: "bg-emerald-100 dark:bg-emerald-900/30",
+  },
+  cancelada: {
+    value: "cancelada",
+    label: "Cancelada",
+    color: "bg-red-100 text-red-800",
+    icon: XCircle,
+    emoji: "❌",
+    iconColor: "text-red-600 dark:text-red-400",
+    iconBgColor: "bg-red-100 dark:bg-red-900/30",
+  },
+  deposito: {
+    value: "deposito",
+    label: "50%",
+    color: "bg-amber-100 text-amber-800",
+    icon: CreditCard,
+    emoji: "🌗",
+    iconColor: "text-amber-600 dark:text-amber-400",
+    iconBgColor: "bg-amber-100 dark:bg-amber-900/30",
+  },
+};
 
 /** All valid order status values */
 export const ORDER_STATUS_VALUES = Object.keys(ORDER_STATUS_CONFIG) as OrderStatusValue[];

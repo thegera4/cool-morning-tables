@@ -20,31 +20,34 @@ export const customerType = defineType({
     defineField({
       name: "name",
       type: "string",
+      title: "Nombre completo",
       group: "details",
-      description: "Nombre completo del cliente",
+      validation: (rule) => [rule.required().error("El nombre es requerido")],
     }),
     defineField({
       name: "phone",
       type: "string",
-      group: "details",
-      description: "Número de teléfono del cliente",
+      title: "Teléfono",
+      group: "details"
     }),
     defineField({
       name: "clerkUserId",
       type: "string",
+      title: "ID en Clerk",
       group: "details",
-      description: "ID de Clerk para autenticación",
+      readOnly: true,
     }),
     defineField({
       name: "stripeCustomerId",
       type: "string",
+      title: "ID en Stripe",
       group: "stripe",
       readOnly: true,
-      description: "ID de cliente de Stripe para pagos",
     }),
     defineField({
       name: "createdAt",
       type: "datetime",
+      title: "Fecha de creación",
       group: "details",
       readOnly: true,
       initialValue: () => new Date().toISOString(),
@@ -60,7 +63,7 @@ export const customerType = defineType({
     prepare({ email, name, stripeCustomerId, phone }) {
       return {
         title: name ?? email ?? "Unknown Customer",
-        subtitle: [email, phone, stripeCustomerId].filter(Boolean).join(" • "),
+        subtitle: [email,].filter(Boolean).join(" • "),
       };
     },
   },

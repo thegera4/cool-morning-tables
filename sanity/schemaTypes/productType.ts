@@ -14,33 +14,36 @@ export const productType = defineType({
     defineField({
       name: "name",
       type: "string",
+      title: "Nombre del producto",
       group: "details",
       validation: (rule) => [rule.required().error("El nombre es necesario.")],
     }),
     defineField({
       name: "slug",
       type: "slug",
+      title: "Identificador",
       group: "details",
       options: {
         source: "name",
         maxLength: 96,
       },
       validation: (rule) => [
-        rule.required().error("El slug (identificador) es necesario para generar la URL."),
+        rule.required().error("El identificador es necesario para generar la URL."),
       ],
     }),
     defineField({
       name: "description",
       type: "text",
+      title: "Descripción del producto",
       group: "details",
       rows: 4,
-      description: "Descripcion del producto",
+      validation: (rule) => [rule.required().error("La descripción es necesaria.")],
     }),
     defineField({
       name: "price",
       type: "number",
+      title: "Precio en MXN",
       group: "details",
-      description: "Precio en MXN (ej. $1990)",
       validation: (rule) => [
         rule.required().error("El precio es necesario."),
         rule.positive().error("El precio debe ser un número positivo"),
@@ -49,6 +52,7 @@ export const productType = defineType({
     defineField({
       name: "images",
       type: "array",
+      title: "Fotos del producto",
       group: "media",
       of: [
         {
@@ -64,11 +68,10 @@ export const productType = defineType({
     }),
     defineField({
       name: "blockedDates",
-      title: "Fechas Bloqueadas",
+      title: "Fechas bloqueadas",
       type: "array",
       of: [{ type: "date" }],
       group: "details",
-      description: "Fechas en las que este producto NO está disponible (reservado o bloqueado).",
       options: {
         sortable: true,
       },
