@@ -1,6 +1,6 @@
 "use client";
 
-import { addMonths, startOfToday, isSameDay } from "date-fns";
+import { addMonths, startOfToday, isSameDay, startOfTomorrow } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar, CalendarDayButton } from "@/components/ui/calendar";
 import { es } from "date-fns/locale";
@@ -21,6 +21,8 @@ interface BookingCalendarProps {
 
 export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendarProps) {
   const today = startOfToday();
+  const currentHour = new Date().getHours();
+  const startDate = currentHour >= 17 ? startOfTomorrow() : today;   // If it's past 5 PM (17:00), bookings start from tomorrow
   const maxDate = addMonths(today, 1);
 
   const CustomDayButton = (props: DayButtonProps) => {
@@ -29,19 +31,9 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
 
     if (isBlocked) {
       return (
-
         <Tooltip>
           <TooltipTrigger asChild>
-            <span tabIndex={0} className="w-full h-full"> {/* Wrap in span to ensure tooltip triggers on disabled button if needed, though pointer-events might block it. shadcn disabled buttons have pointer-events-none usually. */}
-              {/* actually, strict disabled buttons don't fire events. We might need to render a non-disabled looking button or wrap it specifically. 
-                   However, CalendarDayButton renders a Button which might have disabled={true}. 
-                   If disabled, it has opacity-50 and pointer-events-none.
-                   To show tooltip, we need pointer-events-auto on a wrapper or remove pointer-events-none from the button for this specific case.
-                   Let's try wrapping. If button has pointer-events-none, the wrapper catches it? No, needs to be on wrapper.
-                   Actually simpler: Render the button but override className to allow pointer events for the tooltip? 
-                   Or better: Rendering a disabled button often swallows events.
-               */}
-              {/* Let's try wrapping CalendarDayButton. Note: spread props to it. */}
+            <span tabIndex={0} className="w-full h-full">
               <div className="w-full h-full cursor-not-allowed">
                 <CalendarDayButton {...props} />
               </div>
@@ -52,7 +44,6 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
           </TooltipContent>
         </Tooltip>
       );
-
     }
     return <CalendarDayButton {...props} />;
   };
@@ -82,8 +73,8 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
               day_selected: "bg-teal-500 text-white hover:bg-teal-600 hover:text-white focus:bg-teal-500 focus:text-white rounded-md",
               day_today: "bg-gray-100 text-gray-900 border border-gray-200",
             }}
-            disabled={(date) => date < today || date > maxDate || blockedDates.some(blocked => isSameDay(date, blocked))}
-            hidden={{ before: today, after: maxDate }}
+            disabled={(date) => date < startDate || date > maxDate || blockedDates.some(blocked => isSameDay(date, blocked))}
+            hidden={{ before: startDate, after: maxDate }}
             autoFocus
             locale={es}
             components={{
