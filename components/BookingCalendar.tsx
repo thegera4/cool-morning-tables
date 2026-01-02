@@ -27,7 +27,7 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
 
   const CustomDayButton = (props: DayButtonProps) => {
     const { day, modifiers } = props;
-    const isBlocked = blockedDates.some((blocked) => isSameDay(day.date, blocked));
+    const isBlocked = blockedDates.some((blocked) => isSameDay(day.date, blocked)) || day.date.getDay() === 1;
 
     if (isBlocked) {
       return (
@@ -73,7 +73,7 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
               day_selected: "bg-teal-500 text-white hover:bg-teal-600 hover:text-white focus:bg-teal-500 focus:text-white rounded-md",
               day_today: "bg-gray-100 text-gray-900 border border-gray-200",
             }}
-            disabled={(date) => date < startDate || date > maxDate || blockedDates.some(blocked => isSameDay(date, blocked))}
+            disabled={(date) => date < startDate || date > maxDate || date.getDay() === 1 || blockedDates.some(blocked => isSameDay(date, blocked))}
             hidden={{ before: startDate, after: maxDate }}
             autoFocus
             locale={es}
