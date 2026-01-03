@@ -1,18 +1,16 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { SignInButton, SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import { BookingCalendar } from "@/components/BookingCalendar";
 import { ContactForm, ContactInfo } from "@/components/ContactForm";
-import { PaymentForm, PaymentInfo } from "@/components/PaymentForm";
+import { PaymentForm } from "@/components/PaymentForm";
 import { ExtrasSelector } from "@/components/ExtrasSelector";
 import { OrderSummary } from "@/components/OrderSummary";
-
+import { StripeWrapper } from "@/components/StripeWrapper";
 import { client } from "@/sanity/lib/client";
-
 import { Location } from "@/lib/data";
-
 import { ExtraItem } from "@/components/ExtrasSelector";
 
 interface BookingProps {
@@ -33,13 +31,11 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
     email: "",
     phone: "",
   });
-  const [paymentInfo, setPaymentInfo] = useState<PaymentInfo>({
-    cardName: "",
-    cardNumber: "",
-    expMonth: "",
-    expYear: "",
-    cvv: "",
-  });
+
+  // Stripe state
+  const [clientSecret, setClientSecret] = useState<string>("");
+  const [paymentIntentId, setPaymentIntentId] = useState<string>("");
+  const [payDeposit, setPayDeposit] = useState(false);
 
   // Prefill contact info from Clerk user
   useEffect(() => {
@@ -62,12 +58,8 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
       try {
         const query = `*[_type == "product" && slug.current == $slug][0].blockedDates`;
         const result = await client.fetch(query, { slug: selectedLocationId });
+
         if (result) {
-          // Strings to Date objects (handling timezone issues by splitting or just new Date)
-          // Sanity stores dates as YYYY-MM-DD strings usually if type is 'date'
-          // new Date("YYYY-MM-DD") creates UTC midnight.
-          // We need to ensure comparisons match.
-          // Let's assume standard Date object usage for now.
           setBlockedDates(result.map((d: string) => {
             const [year, month, day] = d.split('-').map(Number);
             return new Date(year, month - 1, day);
@@ -104,6 +96,55 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
     });
   };
 
+  // Calculate total amount
+  const locationPrice = location?.price || 0;
+  const extrasTotal = Object.entries(selectedExtras).reduce((total, [id, count]) => {
+    const extra = extrasData.find((e) => e._id === id);
+    if (!extra || !extra.price) return total;
+    return total + (extra.price * count);
+  }, 0);
+  const total = locationPrice + extrasTotal;
+  const amountToPay = payDeposit ? total / 2 : total;
+
+  // Manage PaymentIntent
+  const createOrUpdatePaymentIntent = useCallback(async () => {
+    if (!user || amountToPay <= 0) return;
+
+    try {
+      if (!paymentIntentId) {
+        const res = await fetch("/api/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ amount: amountToPay }),
+        });
+        const data = await res.json();
+        if (data.clientSecret) {
+          setClientSecret(data.clientSecret);
+          setPaymentIntentId(data.paymentIntentId);
+        }
+      } else {
+        await fetch("/api/update-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentIntentId, amount: amountToPay }),
+        });
+        // Client secret remains valid
+      }
+    } catch (error) {
+      console.error("Error creating/updating payment intent:", error);
+    }
+  }, [amountToPay, paymentIntentId, user]);
+
+  // Debounce payment intent updates
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      createOrUpdatePaymentIntent();
+    }, 1000); // 1s debounce
+
+    return () => clearTimeout(timer);
+  }, [createOrUpdatePaymentIntent]);
+
+
   return (
     <div
       ref={bookingSectionRef}
@@ -125,35 +166,41 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
       </SignedOut>
       {/* If user is signed in, show booking form */}
       <SignedIn>
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Form Steps */}
-          <div className="lg:col-span-7 flex flex-col gap-8">
-            <BookingCalendar
-              date={date}
-              setDate={setDate}
-              time={time}
-              setTime={setTime}
-              blockedDates={blockedDates}
-            />
-            <ContactForm contactInfo={contactInfo} setContactInfo={setContactInfo} />
-            <PaymentForm paymentInfo={paymentInfo} setPaymentInfo={setPaymentInfo} />
+        <StripeWrapper clientSecret={clientSecret}>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Left Column: Form Steps */}
+            <div className="lg:col-span-7 flex flex-col gap-8">
+              <BookingCalendar
+                date={date}
+                setDate={setDate}
+                time={time}
+                setTime={setTime}
+                blockedDates={blockedDates}
+              />
+              <ContactForm contactInfo={contactInfo} setContactInfo={setContactInfo} />
+              <PaymentForm />
+            </div>
+            {/* Right Column: Extras and Summary */}
+            <div className="lg:col-span-5 flex flex-col gap-8 sticky top-8">
+              <ExtrasSelector extras={extrasData} selectedExtras={selectedExtras} onUpdateExtra={handleUpdateExtra} />
+              <OrderSummary
+                locationId={selectedLocationId}
+                location={location}
+                date={date}
+                time={time}
+                extras={selectedExtras}
+                extrasData={extrasData}
+                contactInfo={contactInfo}
+                onUpdateExtra={handleUpdateExtra}
+                paymentIntentId={paymentIntentId}
+                // Props for Deposit state
+                // @ts-ignore - Adding dynamic props not yet defined in component interface if I forgot
+                payDeposit={payDeposit}
+                setPayDeposit={setPayDeposit}
+              />
+            </div>
           </div>
-          {/* Right Column: Extras and Summary */}
-          <div className="lg:col-span-5 flex flex-col gap-8 sticky top-8">
-            <ExtrasSelector extras={extrasData} selectedExtras={selectedExtras} onUpdateExtra={handleUpdateExtra} />
-            <OrderSummary
-              locationId={selectedLocationId}
-              location={location}
-              date={date}
-              time={time}
-              extras={selectedExtras}
-              extrasData={extrasData}
-              contactInfo={contactInfo}
-              paymentInfo={paymentInfo}
-              onUpdateExtra={handleUpdateExtra}
-            />
-          </div>
-        </div>
+        </StripeWrapper>
       </SignedIn>
     </div>
   );

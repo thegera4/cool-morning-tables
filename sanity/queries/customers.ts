@@ -6,6 +6,7 @@ export const CUSTOMER_BY_EMAIL_QUERY = defineQuery(`
     name,
     email,
     clerkUserId,
-    stripeCustomerId
+    stripeCustomerId,
+    phone
   }
 `);
