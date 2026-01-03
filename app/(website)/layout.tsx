@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { SanityUserSync } from "@/components/SanityUserSync";
+import { SanityLive } from "@/sanity/lib/live";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,9 +21,6 @@ export const metadata: Metadata = {
   description: "Experiencia Cool Morning en columpios con cena incluida",
 };
 
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { SanityUserSync } from "@/components/SanityUserSync";
-
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode; }>) {
   return (
     <ClerkProvider>
@@ -29,6 +29,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <TooltipProvider>
             <SanityUserSync />
             {children}
+            <SanityLive />
           </TooltipProvider>
         </body>
       </html>

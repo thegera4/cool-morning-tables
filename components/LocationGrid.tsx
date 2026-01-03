@@ -4,7 +4,7 @@
 import Image from "next/image";
 import { Location } from "@/lib/data";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, ImageOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LocationGridProps {
@@ -30,15 +30,22 @@ export function LocationGrid({ selectedLocationId, onSelectLocation, products }:
             onClick={() => onSelectLocation(location.id)}
           >
             <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
-              <Image
-                src={location.imageUrl}
-                alt={location.name}
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                className={cn("object-cover transition-transform duration-500",
-                  isSelected ? "scale-105" : "group-hover:scale-105"
-                )}
-              />
+              {location.imageUrl ? (
+                <Image
+                  src={location.imageUrl}
+                  alt={location.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className={cn("object-cover transition-transform duration-500",
+                    isSelected ? "scale-105" : "group-hover:scale-105"
+                  )}
+                />
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-400">
+                  <ImageOff className="h-10 w-10 mb-2 opacity-50" />
+                  <span className="text-xs font-medium uppercase tracking-wide">Foto no disponible</span>
+                </div>
+              )}
               {isSelected && (
                 <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md">
                   <CheckCircle2 className="h-5 w-5 text-teal-500 fill-teal-50" />

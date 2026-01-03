@@ -133,7 +133,7 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
 
     // Validations
     const isContactInfoComplete = contactInfo.firstName && contactInfo.lastName && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactInfo.email) && contactInfo.phone.replace(/\D/g, "").length === 10;
-    const isValid = locationId && date && isContactInfoComplete;
+    const isValid = !!(locationId && date && isContactInfoComplete);
 
     if (!locationId && !date && Object.keys(extras).length === 0) {
         return (<div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-full flex items-center justify-center text-gray-400 text-sm italic">Selecciona un lugar y fecha para ver el resumen</div>);
