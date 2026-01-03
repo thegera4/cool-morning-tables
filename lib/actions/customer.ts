@@ -35,34 +35,53 @@ export async function getOrCreateCustomer(email: string, name: string | undefine
                 .commit();
         }
 
-        // Backfill Stripe Customer ID if missing
-        if (!existingCustomer.stripeCustomerId && stripe) {
-            try {
-                let stripeCustomerId = "";
-                const customers = await stripe.customers.list({ email: email });
+        // Backfill Stripe Customer ID if missing, OR update phone in Stripe if present
+        if (stripe) {
+            if (!existingCustomer.stripeCustomerId) {
+                try {
+                    let stripeCustomerId = "";
+                    const customers = await stripe.customers.list({ email: email });
 
-                if (customers.data.length > 0) {
-                    stripeCustomerId = customers.data[0].id;
-                } else {
-                    const newCustomer = await stripe.customers.create({
-                        email: email,
-                        name: name,
-                        phone: phone, // Pass phone to Stripe too
-                        metadata: { clerkUserId: clerkUserId },
-                    });
-                    stripeCustomerId = newCustomer.id;
+                    if (customers.data.length > 0) {
+                        stripeCustomerId = customers.data[0].id;
+                        // Update existing stripe customer with new phone/metadata if needed
+                        if (phone || clerkUserId) {
+                            await stripe.customers.update(stripeCustomerId, {
+                                phone: phone,
+                                metadata: { clerkUserId }
+                            });
+                        }
+                    } else {
+                        const newCustomer = await stripe.customers.create({
+                            email: email,
+                            name: name,
+                            phone: phone, // Pass phone to Stripe too
+                            metadata: { clerkUserId: clerkUserId },
+                        });
+                        stripeCustomerId = newCustomer.id;
+                    }
+
+                    // Patch Sanity with new Stripe ID
+                    await writeClient
+                        .patch(existingCustomer._id)
+                        .set({ stripeCustomerId })
+                        .commit();
+
+                    return { sanityCustomerId: existingCustomer._id, stripeCustomerId };
+                } catch (error) {
+                    console.error("Error backfilling Stripe ID:", error);
                 }
-
-                // Patch Sanity with new Stripe ID
-                await writeClient
-                    .patch(existingCustomer._id)
-                    .set({ stripeCustomerId })
-                    .commit();
-
-                return { sanityCustomerId: existingCustomer._id, stripeCustomerId };
-            } catch (error) {
-                console.error("Error backfilling Stripe ID:", error);
-                // Return without stripe ID if failed, but logged
+            } else {
+                // Update existing Stripe customer phone if provided
+                if (phone) {
+                    try {
+                        await stripe.customers.update(existingCustomer.stripeCustomerId, {
+                            phone: phone
+                        });
+                    } catch (err) {
+                        console.error("Error updating stripe customer phone:", err);
+                    }
+                }
             }
         }
 

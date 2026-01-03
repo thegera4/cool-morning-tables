@@ -23,14 +23,14 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
 
   const CustomDayButton = (props: DayButtonProps) => {
     const { day } = props;
-    const isBlocked = blockedDates.some((blocked) => isSameDay(day.date, blocked)) || day.date.getDay() === 1;
+    const isBlocked = blockedDates.some((blocked) => isSameDay(day.date, blocked));
 
     if (isBlocked) {
       return (
         <Tooltip>
           <TooltipTrigger asChild>
             <span tabIndex={0} className="w-full h-full">
-              <div className="w-full h-full cursor-not-allowed"><CalendarDayButton {...props}/></div>
+              <div className="w-full h-full cursor-not-allowed"><CalendarDayButton {...props} /></div>
             </span>
           </TooltipTrigger>
           <TooltipContent><p>No Disponible</p></TooltipContent>
@@ -65,7 +65,7 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
               day_selected: "bg-teal-500 text-white hover:bg-teal-600 hover:text-white focus:bg-teal-500 focus:text-white rounded-md",
               day_today: "bg-gray-100 text-gray-900 border border-gray-200",
             }}
-            disabled={(date) => date < startDate || date > maxDate || date.getDay() === 1 || blockedDates.some(blocked => isSameDay(date, blocked))}
+            disabled={(date) => date < startDate || date > maxDate || blockedDates.some(blocked => isSameDay(date, blocked))}
             hidden={{ before: startDate, after: maxDate }}
             autoFocus
             locale={es}

@@ -14,7 +14,7 @@ interface StripeWrapperProps {
 
 export function StripeWrapper({ children, clientSecret }: StripeWrapperProps) {
   if (!clientSecret) {
-    return <div className="p-4 border border-blue-200 rounded-md bg-blue-50 text-blue-700">Iniciando pago seguro...</div>;
+    return <>{children}</>;
   }
 
   const options = {

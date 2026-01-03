@@ -159,9 +159,34 @@ export const orderType = defineType({
   },
   orderings: [
     {
-      title: "Newest First",
+      title: "Más Nuevas",
       name: "createdAtDesc",
       by: [{ field: "createdAt", direction: "desc" }],
+    },
+    {
+      title: "Más Antiguas",
+      name: "createdAtAsc",
+      by: [{ field: "createdAt", direction: "asc" }],
+    },
+    {
+      title: "Mayor Cantidad Pagada",
+      name: "amountPaidDesc",
+      by: [{ field: "amountPaid", direction: "desc" }],
+    },
+    {
+      title: "Menor Cantidad Pagada",
+      name: "amountPaidAsc",
+      by: [{ field: "amountPaid", direction: "asc" }],
+    },
+    {
+      title: "Estatus (A-Z)",
+      name: "statusAsc",
+      by: [{ field: "status", direction: "asc" }],
+    },
+    {
+      title: "Estatus (Z-A)",
+      name: "statusDesc",
+      by: [{ field: "status", direction: "desc" }],
     },
   ],
 });

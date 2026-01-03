@@ -108,7 +108,8 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
 
   // Manage PaymentIntent
   const createOrUpdatePaymentIntent = useCallback(async () => {
-    if (!user || amountToPay <= 0) return;
+    // Wait for date to be selected before creating PI to avoid incomplete spam
+    if (!user || amountToPay <= 0 || !date) return;
 
     try {
       if (!paymentIntentId) {
@@ -133,7 +134,7 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
     } catch (error) {
       console.error("Error creating/updating payment intent:", error);
     }
-  }, [amountToPay, paymentIntentId, user]);
+  }, [amountToPay, paymentIntentId, user, date]);
 
   // Debounce payment intent updates
   useEffect(() => {
@@ -178,7 +179,15 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
                 blockedDates={blockedDates}
               />
               <ContactForm contactInfo={contactInfo} setContactInfo={setContactInfo} />
-              <PaymentForm />
+
+              {/* Only show PaymentForm if we have a clientSecret (meaning date is picked and PI created) */}
+              {clientSecret ? (
+                <PaymentForm />
+              ) : (
+                <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 h-full flex items-center justify-center text-gray-400 text-sm italic">
+                  Selecciona la fecha para ver las opciones de pago
+                </div>
+              )}
             </div>
             {/* Right Column: Extras and Summary */}
             <div className="lg:col-span-5 flex flex-col gap-8 sticky top-8">

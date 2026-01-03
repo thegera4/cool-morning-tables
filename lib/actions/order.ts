@@ -64,9 +64,11 @@ export async function createOrder({ paymentIntentId, items, totalAmount, custome
 
     const status = amountPending > 0 ? "deposito" : "pagada";
 
+    const orderNumberVal = `ORD-${randomUUID().slice(0, 8).toUpperCase()}`;
+
     const order = await writeClient.create({
       _type: "order",
-      orderNumber: `ORD-${randomUUID().slice(0, 8).toUpperCase()}`, // Using UUID
+      orderNumber: orderNumberVal,
       reservationDate: reservationDate, // Use passed date
       items: resolvedItems.map((item: any) => ({
         _type: "object",
@@ -84,6 +86,13 @@ export async function createOrder({ paymentIntentId, items, totalAmount, custome
       email: email,
       stripePaymentId: paymentIntentId,
       createdAt: new Date().toISOString(),
+    });
+
+    // Update Stripe Metadata with Order Number
+    await stripe.paymentIntents.update(paymentIntentId, {
+      metadata: {
+        orderNumber: orderNumberVal
+      }
     });
 
     // 4. Update Product Blocked Dates
