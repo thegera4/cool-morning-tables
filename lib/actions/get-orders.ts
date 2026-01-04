@@ -31,7 +31,10 @@ export async function getOrders() {
       product->{
         name,
         slug,
-        images
+        name,
+        slug,
+        images,
+        _type
       }
     }
   }`;

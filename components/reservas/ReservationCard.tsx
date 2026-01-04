@@ -1,12 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import { urlFor } from "@/sanity/lib/image";
 import { getOrderStatus } from "@/lib/constants/orderStatus";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Image from "next/image";
-import { Calendar, Clock, CreditCard } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Calendar, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 // Assuming Badge doesn't exist in ui/badge based on file list, I'll default to Tailwind classes or check if I missed it.
@@ -17,8 +17,11 @@ interface ReservationCardProps {
 }
 
 export function ReservationCard({ order }: ReservationCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
   const statusConfig = getOrderStatus(order.status);
-  const mainItem = order.items?.[0];
+  // Find the main product item (not extras)
+  // If multiple products or none found, fallback to first item
+  const mainItem = order.items?.find((item: any) => item.product?._type === 'product') || order.items?.[0];
   const product = mainItem?.product;
 
   // Format dates
@@ -38,25 +41,39 @@ export function ReservationCard({ order }: ReservationCardProps) {
   const imageUrl = product?.images?.[0] ? urlFor(product.images[0]).url() : "/placeholder.png";
 
   return (
-    <Card className="overflow-hidden border-none shadow-sm bg-white dark:bg-zinc-900 mb-4">
-      <CardContent className="p-0 sm:flex">
+    <Card className="overflow-hidden border-none shadow-sm bg-white dark:bg-zinc-900 mb-4 transition-all">
+      <CardContent className="p-0 sm:flex items-start">
         <div className="flex-1 p-6">
           <div className="flex items-center justify-between mb-4">
             <div className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${statusConfig.color.replace('text-', 'text-').replace('bg-', 'bg-')}`}>
               <statusConfig.icon className="w-3.5 h-3.5" />
               {statusConfig.label}
             </div>
-            <span className="text-zinc-400 text-sm font-medium">#{order.orderNumber}</span>
           </div>
 
-          <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
-            {product?.name || "Reservación"}
-          </h3>
-          <p className="text-zinc-500 text-sm mb-4">
-            {/* Subtitle/Description - hardcoded or from product */}
-            {/* Cena Romántica • 2 Personas */}
-            {mainItem?.quantity && `${mainItem.quantity} Personas`}
-          </p>
+          <div
+            className="flex items-center gap-2 mb-2 cursor-pointer group"
+            onClick={() => setIsExpanded(!isExpanded)}
+          >
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-orange-600 transition-colors">
+              Order #{order.orderNumber}
+            </h3>
+            {isExpanded ? (
+              <ChevronUp className="w-5 h-5 text-zinc-400 group-hover:text-orange-500" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-zinc-400 group-hover:text-orange-500" />
+            )}
+          </div>
+
+          {isExpanded && (
+            <div className="flex flex-col gap-1 mb-4 animate-in fade-in slide-in-from-top-1 duration-200">
+              {order.items?.map((item: any) => (
+                <p key={item._key} className="text-zinc-500 text-sm pl-2 border-l-2 border-zinc-100 dark:border-zinc-800">
+                  {item.quantity}x {item.product?.name}
+                </p>
+              ))}
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-4 mb-6 text-sm text-zinc-600 dark:text-zinc-400">
             <div className="flex items-center gap-2">
@@ -69,33 +86,19 @@ export function ReservationCard({ order }: ReservationCardProps) {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            {order.status === 'deposito' || order.status === 'pendiente' ? (
-              <Button className="bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900">
-                <CreditCard className="w-4 h-4 mr-2" />
-                Pagar ${order.amountPending}
-              </Button>
-            ) : (
-              <Button className="bg-orange-500 hover:bg-orange-600 text-white border-none shadow-orange-500/20 shadow-lg">
-                Ver Detalles
-              </Button>
-            )}
 
-            {/* Cancel logic not implemented yet */}
-            <Button variant="ghost" className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300">
-              Cancelar
-            </Button>
-          </div>
         </div>
 
         {/* Image Section */}
-        <div className="hidden sm:block w-72 h-auto relative shrink-0">
-          <Image
-            src={imageUrl}
-            alt={product?.name || "Reservation"}
-            fill
-            className="object-cover h-full w-full"
-          />
+        <div className="hidden sm:block p-4">
+          <div className="w-48 h-32 relative shrink-0 rounded-lg overflow-hidden">
+            <Image
+              src={imageUrl}
+              alt={product?.name || "Reservation"}
+              fill
+              className="object-cover"
+            />
+          </div>
         </div>
       </CardContent>
     </Card>
