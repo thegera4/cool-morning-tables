@@ -15,6 +15,7 @@ import { apiVersion, dataset, projectId } from './sanity/env'
 import { schema } from './sanity/schemaTypes'
 import { structure } from './sanity/structure'
 import { ExportTool } from './sanity/tools/export-tool'
+import { PublishOrderAction } from './sanity/actions/publish-order'
 
 export default defineConfig({
   basePath: '/studio',
@@ -39,5 +40,15 @@ export default defineConfig({
         icon: ShareIcon
       }
     ]
-  }
+  },
+  document: {
+    actions: (prev, context) => {
+      if (context.schemaType === 'order') {
+        return prev.map((originalAction) =>
+          originalAction.action === 'publish' ? PublishOrderAction : originalAction
+        )
+      }
+      return prev
+    },
+  },
 })
