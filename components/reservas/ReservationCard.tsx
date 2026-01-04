@@ -9,9 +9,6 @@ import Image from "next/image";
 import { Calendar, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
-// Assuming Badge doesn't exist in ui/badge based on file list, I'll default to Tailwind classes or check if I missed it.
-// Checking file list... no badge.tsx. I will implement a simple badge span.
-
 interface ReservationCardProps {
   order: any; // Type this properly if possible, or use the inferred type from params
 }
@@ -29,14 +26,6 @@ export function ReservationCard({ order }: ReservationCardProps) {
   const formattedDate = format(reservationDate, "EEEE, d 'de' MMMM", { locale: es });
   // Capitalize first letter
   const formattedDateCapitalized = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
-
-  // Mock times for now as they aren't in the partial query provided in getOrders,
-  // or assume reservationDate has time? The schema says 'date', usually YYYY-MM-DD.
-  // Unless 'datetime'. orderType says: reservationDate is 'date'.
-  // So time might be fixed or not stored. The design shows times. 
-  // I will just show the date for now or 20:00 - 22:00 hardcoded if data missing.
-  // Update: check orderType.ts. reservationDate is 'date'. 
-  // But wait, the design shows "20:00 - 22:00". Maybe I should assume a dinner slot.
 
   const imageUrl = product?.images?.[0] ? urlFor(product.images[0]).url() : "/placeholder.png";
 
@@ -85,8 +74,6 @@ export function ReservationCard({ order }: ReservationCardProps) {
               <span>20:00 - 22:00</span> {/* Hardcoded time slot based on design since data missing */}
             </div>
           </div>
-
-
         </div>
 
         {/* Image Section */}
