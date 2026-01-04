@@ -60,7 +60,6 @@ export const PublishOrderAction: DocumentActionComponent = (props) => {
         console.error("[PublishOrderAction] Failed to update blocked dates:", err);
       }
 
-      props.onComplete();
     },
   };
 };
