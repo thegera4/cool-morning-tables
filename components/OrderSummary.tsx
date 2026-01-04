@@ -92,14 +92,18 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
         });
     };
 
+    const isDisabled = isPending || !isValid || !stripe;
+
     return (
-        <Button
-            onClick={handlePayment}
-            disabled={isPending || !isValid || !stripe}
-            className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold h-12 text-base shadow-lg shadow-teal-500/20 hover:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-            {isPending ? "Procesando..." : "Pagar"}
-        </Button>
+        <div className={isDisabled ? "cursor-not-allowed" : ""}>
+            <Button
+                onClick={handlePayment}
+                disabled={isDisabled}
+                className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold h-12 text-base shadow-lg shadow-teal-500/20 hover:cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+            >
+                {isPending ? "Procesando..." : "Pagar"}
+            </Button>
+        </div>
     );
 }
 
@@ -115,9 +119,10 @@ interface OrderSummaryProps {
     paymentIntentId: string | undefined;
     payDeposit: boolean;
     setPayDeposit: (val: boolean) => void;
+    isStripeComplete: boolean;
 }
 
-export function OrderSummary({ locationId, location, date, time, extras, extrasData, contactInfo, onUpdateExtra, paymentIntentId, payDeposit, setPayDeposit }: OrderSummaryProps) {
+export function OrderSummary({ locationId, location, date, time, extras, extrasData, contactInfo, onUpdateExtra, paymentIntentId, payDeposit, setPayDeposit, isStripeComplete }: OrderSummaryProps) {
     const [isPending, startTransition] = useTransition();
 
     const locationPrice = location?.price || 0;
@@ -133,7 +138,7 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
 
     // Validations
     const isContactInfoComplete = contactInfo.firstName && contactInfo.lastName && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contactInfo.email) && contactInfo.phone.replace(/\D/g, "").length === 10;
-    const isValid = !!(locationId && date && isContactInfoComplete);
+    const isValid = !!(locationId && date && isContactInfoComplete && isStripeComplete);
 
     if (!locationId && !date && Object.keys(extras).length === 0) {
         return (<div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-full flex items-center justify-center text-gray-400 text-sm italic">Selecciona un lugar y fecha para ver el resumen</div>);
@@ -244,6 +249,7 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                 <div className="mt-3 space-y-1">
                     {!date && <p className="text-xs text-amber-600 font-medium flex items-center gap-1">⚠️ Por favor selecciona una fecha</p>}
                     {!isContactInfoComplete && <p className="text-xs text-amber-600 font-medium flex items-center gap-1">⚠️ Información de contacto incompleta</p>}
+                    {!isStripeComplete && <p className="text-xs text-amber-600 font-medium flex items-center gap-1">⚠️ Información de pago incompleta</p>}
                 </div>
             </div>
         </div>

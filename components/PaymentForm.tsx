@@ -13,7 +13,11 @@ export interface PaymentInfo {
     cvv: string;
 }
 
-export function PaymentForm() {
+interface PaymentFormProps {
+    onComplete: (completed: boolean) => void;
+}
+
+export function PaymentForm({ onComplete }: PaymentFormProps) {
     return (
         <div className="flex flex-col gap-6 p-6 bg-white rounded-lg shadow-sm border border-gray-100 h-full">
             <div className="flex items-center gap-3 mb-2">
@@ -23,6 +27,7 @@ export function PaymentForm() {
 
             <div className="flex flex-col gap-4">
                 <PaymentElement
+                    onChange={(event) => onComplete(event.complete)}
                     options={{
                         layout: 'tabs',
                         business: { name: 'Cool Morning' }

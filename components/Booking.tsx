@@ -36,6 +36,7 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
   const [clientSecret, setClientSecret] = useState<string>("");
   const [paymentIntentId, setPaymentIntentId] = useState<string>("");
   const [payDeposit, setPayDeposit] = useState(false);
+  const [isStripeComplete, setIsStripeComplete] = useState(false);
 
   // Prefill contact info from Clerk user
   useEffect(() => {
@@ -182,7 +183,7 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
 
               {/* Only show PaymentForm if we have a clientSecret (meaning date is picked and PI created) */}
               {clientSecret ? (
-                <PaymentForm />
+                <PaymentForm onComplete={setIsStripeComplete} />
               ) : (
                 <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-100 h-full flex items-center justify-center text-gray-400 text-sm italic">
                   Selecciona la fecha para ver las opciones de pago
@@ -206,6 +207,7 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
                 // @ts-ignore - Adding dynamic props not yet defined in component interface if I forgot
                 payDeposit={payDeposit}
                 setPayDeposit={setPayDeposit}
+                isStripeComplete={isStripeComplete}
               />
             </div>
           </div>
