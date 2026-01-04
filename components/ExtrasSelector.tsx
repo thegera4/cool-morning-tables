@@ -21,6 +21,10 @@ interface ExtrasSelectorProps {
 
 export function ExtrasSelector({ extras, selectedExtras, onUpdateExtra }: ExtrasSelectorProps) {
 
+    if (!extras || extras.length === 0) {
+        return null;
+    }
+
     const handleToggle = (extra: ExtraItem, checked: boolean) => {
         onUpdateExtra(extra._id, checked ? 1 : 0);
     };

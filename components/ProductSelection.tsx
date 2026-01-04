@@ -13,11 +13,17 @@ export function ProductSelection({ selectedLocationId, onSelectLocation, product
       <div className="mb-8 flex items-center gap-3">
         <h3 className="text-teal-500 font-bold text-lg">Selecciona tu lugar:</h3>
       </div>
-      <LocationGrid
-        selectedLocationId={selectedLocationId}
-        onSelectLocation={onSelectLocation}
-        products={products}
-      />
+      {products.length > 0 ? (
+        <LocationGrid
+          selectedLocationId={selectedLocationId}
+          onSelectLocation={onSelectLocation}
+          products={products}
+        />
+      ) : (
+        <div className="p-12 text-center bg-gray-50 border border-gray-100 rounded-lg">
+          <p className="text-gray-500 font-medium italic">Lo sentimos, no existen mesas disponible por el momento.</p>
+        </div>
+      )}
     </>
   );
 }
