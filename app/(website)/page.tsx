@@ -3,6 +3,7 @@ import { HomeClient } from "@/components/HomeClient";
 import { ALL_EXTRAS_QUERY } from "@/sanity/queries/extras";
 import { Location } from "@/lib/data";
 import { ExtraItem } from "@/components/ExtrasSelector";
+import { Suspense } from "react";
 
 const PRODUCTS_QUERY = `*[_type == "product"]{
   "id": slug.current,
@@ -19,9 +20,11 @@ export default async function Home() {
   ]);
 
   return (
-    <HomeClient
-      products={productsResult.data as Location[]}
-      extras={extrasResult.data as ExtraItem[]}
-    />
+    <Suspense>
+      <HomeClient
+        products={productsResult.data as Location[]}
+        extras={extrasResult.data as ExtraItem[]}
+      />
+    </Suspense>
   );
 }

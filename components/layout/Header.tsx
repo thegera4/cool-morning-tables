@@ -1,7 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 
 export function Header() {
+  const pathname = usePathname();
+  const isReservationsPage = pathname === "/reservas";
+
   return (
     <header className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 md:px-12">
       <div className="flex items-center">
@@ -11,9 +17,21 @@ export function Header() {
       </div>
       <div className="flex items-center gap-6">
         <SignedIn>
-          <Link href="/reservas" className="text-white text-xs md:text-sm font-medium tracking-wider uppercase hover:underline underline-offset-4">
-            MIS RESERVAS
-          </Link>
+          {isReservationsPage ? (
+            <Link
+              href="/"
+              className="text-teal-500 text-xs md:text-sm font-bold tracking-wider uppercase hover:underline underline-offset-4"
+            >
+              REGRESAR A PAGINA PRINCIPAL
+            </Link>
+          ) : (
+            <Link
+              href="/reservas"
+              className="text-white text-xs md:text-sm font-medium tracking-wider uppercase hover:underline underline-offset-4"
+            >
+              MIS RESERVAS
+            </Link>
+          )}
           <UserButton />
         </SignedIn>
         <SignedOut>

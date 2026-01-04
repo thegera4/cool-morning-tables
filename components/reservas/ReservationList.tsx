@@ -1,0 +1,81 @@
+"use client";
+
+import { useState } from "react";
+import { ReservationCard } from "./ReservationCard";
+import { isAfter, isBefore, startOfDay } from "date-fns";
+
+interface ReservationListProps {
+  orders: any[];
+}
+
+type Tab = "upcoming" | "history";
+
+export function ReservationList({ orders }: ReservationListProps) {
+  const [activeTab, setActiveTab] = useState<Tab>("upcoming");
+
+  const today = startOfDay(new Date());
+
+  // Split orders into upcoming and history
+  const upcomingOrders = orders.filter((order) => {
+    const orderDate = new Date(order.reservationDate);
+    // Include today in upcoming
+    return isAfter(orderDate, today) || orderDate.getTime() === today.getTime();
+  });
+
+  const historyOrders = orders.filter((order) => {
+    const orderDate = new Date(order.reservationDate);
+    return isBefore(orderDate, today);
+  });
+
+  const currentTabOrders = activeTab === "upcoming" ? upcomingOrders : historyOrders;
+
+  return (
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="mb-8 pl-1">
+        <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">Mis Reservas</h1>
+        <p className="text-zinc-500">Gestiona tus próximas visitas y revisa tu historial de cenas.</p>
+      </div>
+
+      {/* Main Tabs (Próximas / Historial) */}
+      <div className="flex gap-8 border-b border-zinc-200 dark:border-zinc-800 mb-6">
+        <button
+          onClick={() => setActiveTab("upcoming")}
+          className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === "upcoming"
+            ? "text-orange-500"
+            : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
+            }`}
+        >
+          Próximas
+          {activeTab === "upcoming" && (
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500 rounded-t-full" />
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab("history")}
+          className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === "history"
+            ? "text-orange-500"
+            : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
+            }`}
+        >
+          Historial
+          {activeTab === "history" && (
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500 rounded-t-full" />
+          )}
+        </button>
+      </div>
+
+      {/* List */}
+      <div className="space-y-4">
+        {currentTabOrders.length > 0 ? (
+          currentTabOrders.map((order) => (
+            <ReservationCard key={order._id} order={order} />
+          ))
+        ) : (
+          <div className="text-center py-12 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg">
+            <p className="text-zinc-500">No hay reservaciones en esta sección.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

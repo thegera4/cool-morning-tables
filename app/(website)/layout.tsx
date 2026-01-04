@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SanityUserSync } from "@/components/SanityUserSync";
 import { SanityLive } from "@/sanity/lib/live";
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <SanityUserSync />
             {children}
             <SanityLive />
+            <Toaster />
           </TooltipProvider>
         </body>
       </html>
