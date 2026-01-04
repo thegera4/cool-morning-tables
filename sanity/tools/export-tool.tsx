@@ -28,16 +28,16 @@ export const ExportTool = () => {
         _id,
         orderNumber,
         reservationDate,
-        customerName,
-        customerEmail,
-        customerPhone,
+        "customerName": customer->name,
+        "customerEmail": customer->email,
+        "customerPhone": customer->phone,
         total,
         amountPaid,
         amountPending,
         status,
         "items": items[] {
           quantity,
-          name,
+          "name": product->name,
           price
         },
         createdAt
