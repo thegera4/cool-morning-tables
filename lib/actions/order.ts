@@ -85,6 +85,7 @@ export async function createOrder({ paymentIntentId, items, totalAmount, custome
       clerkUserId: user.id,
       email: email,
       stripePaymentId: paymentIntentId,
+      source: "web",
       createdAt: new Date().toISOString(),
     });
 

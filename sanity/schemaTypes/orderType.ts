@@ -19,7 +19,31 @@ export const orderType = defineType({
       title: "Número de Orden",
       group: "details",
       readOnly: true,
+      initialValue: () => `ORD-${Math.random().toString(36).substring(2, 8).toUpperCase()}`,
       validation: (rule) => [rule.required().error("El número de orden es requerido")],
+    }),
+    defineField({
+      name: "source",
+      type: "string",
+      title: "Origen de la orden",
+      group: "details",
+      options: {
+        list: [
+          { title: "Sitio Web", value: "web" },
+          { title: "Manual (Administrador)", value: "manual" },
+        ],
+        layout: "radio"
+      },
+      initialValue: "manual",
+      readOnly: true,
+    }),
+    defineField({
+      name: "paymentProofs",
+      type: "array",
+      title: "Comprobantes de Pago",
+      description: "Sube aquí fotos de los recibos o transferencias si la orden fue manual o requirió validación externa.",
+      group: "payment",
+      of: [{ type: "image", options: { hotspot: true } }],
     }),
     defineField({
       name: "reservationDate",
@@ -79,8 +103,7 @@ export const orderType = defineType({
       name: "total",
       type: "number",
       title: "Total de la orden en MXN",
-      group: "details",
-      readOnly: true
+      group: "details"
     }),
     defineField({
       name: "amountPaid",
@@ -123,8 +146,7 @@ export const orderType = defineType({
     defineField({
       name: "email",
       type: "string",
-      group: "customer",
-      readOnly: true
+      group: "customer"
     }),
     defineField({
       name: "stripePaymentId",
