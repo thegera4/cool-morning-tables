@@ -1,7 +1,14 @@
+"use client";
+
 import Link from "next/link";
+import { SignedIn } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
 import { Facebook, Instagram, MessageCircle } from "lucide-react";
 
 export function Footer() {
+    const pathname = usePathname();
+    const isReservationsPage = pathname === "/reservas";
+
     return (
         <footer className="w-full bg-teal-500 text-white py-8 px-6 md:px-12">
             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
@@ -15,6 +22,17 @@ export function Footer() {
                 </div>
 
                 <div className="flex items-center gap-8">
+                    <SignedIn>
+                        {isReservationsPage ? (
+                            <Link href="/" className="text-xs font-bold tracking-widest text-teal-100 hover:text-white transition-colors">
+                                REGRESAR A PAGINA PRINCIPAL
+                            </Link>
+                        ) : (
+                            <Link href="/reservas" className="text-xs font-bold tracking-widest text-teal-100 hover:text-white transition-colors">
+                                MIS RESERVAS
+                            </Link>
+                        )}
+                    </SignedIn>
                     <span className="text-xs font-bold tracking-widest text-teal-100">CONTACTO:</span>
                     <div className="flex items-center gap-4">
                         <Link href="#" className="hover:text-teal-200 transition-colors">

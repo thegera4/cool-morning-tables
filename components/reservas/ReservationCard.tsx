@@ -6,7 +6,7 @@ import { getOrderStatus } from "@/lib/constants/orderStatus";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Image from "next/image";
-import { Calendar, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { Calendar, Clock, ChevronDown, ChevronUp, ClipboardList } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface ReservationCardProps {
@@ -22,10 +22,16 @@ export function ReservationCard({ order }: ReservationCardProps) {
   const product = mainItem?.product;
 
   // Format dates
-  const reservationDate = new Date(order.reservationDate);
+  // Manually parse YYYY-MM-DD to ensure it's treated as local time, not UTC
+  const [year, month, day] = order.reservationDate.split("-").map(Number);
+  const reservationDate = new Date(year, month - 1, day);
   const formattedDate = format(reservationDate, "EEEE, d 'de' MMMM", { locale: es });
   // Capitalize first letter
   const formattedDateCapitalized = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
+
+  // Time slot logic
+  const isSunday = reservationDate.getDay() === 0;
+  const reservationTime = isSunday ? "19:00 - 20:45" : "20:15 - 22:45";
 
   const imageUrl = product?.images?.[0] ? urlFor(product.images[0]).url() : "/placeholder.png";
 
@@ -33,24 +39,37 @@ export function ReservationCard({ order }: ReservationCardProps) {
     <Card className="overflow-hidden border-none shadow-sm bg-white dark:bg-zinc-900 mb-4 transition-all">
       <CardContent className="p-0 sm:flex items-start">
         <div className="flex-1 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${statusConfig.color.replace('text-', 'text-').replace('bg-', 'bg-')}`}>
-              <statusConfig.icon className="w-3.5 h-3.5" />
-              {statusConfig.label}
+          <div className="flex flex-col items-start mb-4">
+            <div className="flex items-center gap-2">
+              <div className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${statusConfig.color.replace('text-', 'text-').replace('bg-', 'bg-')}`}>
+                <statusConfig.icon className="w-3.5 h-3.5" />
+                {statusConfig.label}
+              </div>
+              {order.source === 'manual' && (
+                <div className="px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                  <ClipboardList className="w-3.5 h-3.5" />
+                  Manual
+                </div>
+              )}
             </div>
+            {order.status === 'deposito' && (
+              <p className="text-xs text-amber-600 dark:text-amber-500 font-medium mt-1 max-w-[500px] leading-tight">
+                Recuerda que tienes pendiente pagar el 50% del costo total de tu reservación.
+              </p>
+            )}
           </div>
 
           <div
             className="flex items-center gap-2 mb-2 cursor-pointer group"
             onClick={() => setIsExpanded(!isExpanded)}
           >
-            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-orange-600 transition-colors">
-              Order #{order.orderNumber}
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-700 transition-colors">
+              {order.orderNumber}
             </h3>
             {isExpanded ? (
-              <ChevronUp className="w-5 h-5 text-zinc-400 group-hover:text-orange-500" />
+              <ChevronUp className="w-5 h-5 text-zinc-400 group-hover:text-amber-700" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-zinc-400 group-hover:text-orange-500" />
+              <ChevronDown className="w-5 h-5 text-zinc-400 group-hover:text-amber-700" />
             )}
           </div>
 
@@ -58,26 +77,50 @@ export function ReservationCard({ order }: ReservationCardProps) {
             <div className="flex flex-col gap-1 mb-4 animate-in fade-in slide-in-from-top-1 duration-200">
               {order.items?.map((item: any) => (
                 <p key={item._key} className="text-zinc-500 text-sm pl-2 border-l-2 border-zinc-100 dark:border-zinc-800">
-                  {item.quantity}x {item.product?.name}
+                  • {item.product?.name} - ({item.quantity})
                 </p>
               ))}
             </div>
           )}
 
-          <div className="flex flex-wrap gap-4 mb-6 text-sm text-zinc-600 dark:text-zinc-400">
+          <div className="flex flex-wrap gap-4 mb-4 text-sm text-zinc-600 dark:text-zinc-400">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-orange-500" />
+              <Calendar className="w-4 h-4 text-amber-700" />
               <span>{formattedDateCapitalized}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-orange-500" />
-              <span>20:00 - 22:00</span> {/* Hardcoded time slot based on design since data missing */}
+              <Clock className="w-4 h-4 text-amber-700" />
+              <span>{reservationTime}</span>
             </div>
+          </div>
+
+          <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800">
+            {order.status === 'deposito' ? (
+              <div className="space-y-1 text-sm">
+                <div className="flex justify-between text-zinc-500">
+                  <span>Total reservación:</span>
+                  <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.total)}</span>
+                </div>
+                <div className="flex justify-between text-zinc-500">
+                  <span>Pagado (50%):</span>
+                  <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.amountPaid)}</span>
+                </div>
+                <div className="flex justify-between font-bold text-amber-700">
+                  <span>Pendiente (50%):</span>
+                  <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.amountPending)}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="flex justify-between font-bold text-zinc-900 dark:text-zinc-100">
+                <span>Total pagado:</span>
+                <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.total)}</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Image Section */}
-        <div className="hidden sm:block p-4">
+        <div className="hidden sm:block p-6 pl-0">
           <div className="w-48 h-32 relative shrink-0 rounded-lg overflow-hidden">
             <Image
               src={imageUrl}

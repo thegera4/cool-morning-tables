@@ -14,12 +14,15 @@ export async function getOrders() {
     return [];
   }
 
-  // Fetch orders where clerkUserId matches the current user's ID
+  const email = user.emailAddresses[0]?.emailAddress;
+
+  // Fetch orders where clerkUserId matches the current user's ID OR the email matches
   // Sort by reservationDate descending (newest first)
-  const query = `*[_type == "order" && clerkUserId == $userId] | order(reservationDate desc) {
+  const query = `*[_type == "order" && (clerkUserId == $userId || email == $userEmail)] | order(reservationDate desc) {
     _id,
     orderNumber,
     reservationDate,
+    source,
     status,
     total,
     amountPaid,
@@ -39,7 +42,7 @@ export async function getOrders() {
     }
   }`;
 
-  const orders = await client.fetch(query, { userId: user.id });
+  const orders = await client.fetch(query, { userId: user.id, userEmail: email });
 
   return orders;
 }

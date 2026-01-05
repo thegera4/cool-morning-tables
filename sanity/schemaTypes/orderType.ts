@@ -116,7 +116,6 @@ export const orderType = defineType({
       type: "number",
       title: "Cantidad pendiente a pagar (2 días antes de la reserva)",
       group: "payment",
-      readOnly: true,
       initialValue: (value) => value.total - value.amountPaid
     }),
     defineField({

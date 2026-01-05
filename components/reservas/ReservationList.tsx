@@ -17,13 +17,24 @@ export function ReservationList({ orders }: ReservationListProps) {
 
   // Split orders into upcoming and history
   const upcomingOrders = orders.filter((order) => {
-    const orderDate = new Date(order.reservationDate);
+    // Manually parse YYYY-MM-DD to ensure it's treated as local time
+    const [year, month, day] = order.reservationDate.split("-").map(Number);
+    const orderDate = new Date(year, month - 1, day);
     // Include today in upcoming
     return isAfter(orderDate, today) || orderDate.getTime() === today.getTime();
+  }).sort((a, b) => {
+    // Sort Ascending (closest first)
+    const [yA, mA, dA] = a.reservationDate.split("-").map(Number);
+    const dateA = new Date(yA, mA - 1, dA);
+    const [yB, mB, dB] = b.reservationDate.split("-").map(Number);
+    const dateB = new Date(yB, mB - 1, dB);
+    return dateA.getTime() - dateB.getTime();
   });
 
   const historyOrders = orders.filter((order) => {
-    const orderDate = new Date(order.reservationDate);
+    // Manually parse YYYY-MM-DD to ensure it's treated as local time
+    const [year, month, day] = order.reservationDate.split("-").map(Number);
+    const orderDate = new Date(year, month - 1, day);
     return isBefore(orderDate, today);
   });
 
@@ -41,25 +52,25 @@ export function ReservationList({ orders }: ReservationListProps) {
         <button
           onClick={() => setActiveTab("upcoming")}
           className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === "upcoming"
-            ? "text-orange-500"
+            ? "text-amber-700"
             : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
             }`}
         >
           Próximas
           {activeTab === "upcoming" && (
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500 rounded-t-full" />
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-amber-700 rounded-t-full" />
           )}
         </button>
         <button
           onClick={() => setActiveTab("history")}
           className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === "history"
-            ? "text-orange-500"
+            ? "text-amber-700"
             : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
             }`}
         >
           Historial
           {activeTab === "history" && (
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-orange-500 rounded-t-full" />
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-amber-700 rounded-t-full" />
           )}
         </button>
       </div>

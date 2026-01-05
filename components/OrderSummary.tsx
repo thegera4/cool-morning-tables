@@ -11,6 +11,7 @@ import { createOrder } from "@/lib/actions/order";
 import { useTransition } from "react";
 import { ExtraItem } from "@/components/ExtrasSelector";
 import { useStripe, useElements } from "@stripe/react-stripe-js";
+import { toast } from "sonner";
 
 interface CheckoutButtonProps {
     isValid: boolean | string | null; // Allow null to match usage
@@ -38,7 +39,7 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
                 // 1. Submit elements details
                 const { error: submitError } = await elements.submit();
                 if (submitError) {
-                    alert(submitError.message);
+                    toast.error(submitError.message);
                     return;
                 }
 
@@ -59,7 +60,10 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
                 });
 
                 if (error) {
-                    alert(error.message);
+                    toast.error("Lo sentimos, pago rechazado. Revisa tus datos o intenta de nuevo con otra tarjeta", {
+                        className: "!bg-red-50 !text-red-600 !border-red-200",
+                        style: { color: 'red' }
+                    });
                 } else if (paymentIntent && paymentIntent.status === 'succeeded') {
                     // 3. Create Order
                     const formattedDate = format(date, "yyyy-MM-dd");
@@ -79,15 +83,22 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
                     });
 
                     if (result.success) {
-                        alert(`¡Orden creada! ID: ${result.orderId}. Gracias por tu compra.`);
-                        window.location.reload();
+                        toast.success("Pago Exitoso! Se ha enviado un email a tu cuenta con los detalles. También puedes revisar en \"MIS RESERVAS\" tu historial. La pagina se actualizará en unos segundos", {
+                            className: "!bg-green-50 !text-green-600 !border-green-200",
+                            style: { color: 'green' },
+                            duration: 10000,
+                        });
+                        setTimeout(() => { window.location.reload(); }, 10000);
                     } else {
-                        alert(`Error creando la orden: ${result.error}`);
+                        toast.error(`Error al crear la orden`);
                     }
                 }
             } catch (e: any) {
                 console.error(e);
-                alert("Ocurrio un error inesperado.");
+                toast.error("Ocurrio un error inesperado.", {
+                    className: "!bg-red-50 !text-red-600 !border-red-200",
+                    style: { color: 'red' }
+                });
             }
         });
     };

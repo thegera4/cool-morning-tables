@@ -37,7 +37,7 @@ export function Hero() {
                 asChild
                 className="bg-teal-500 hover:bg-teal-600 text-white rounded-full px-8 h-10 text-xs font-bold tracking-wide uppercase shadow-lg shadow-teal-500/20"
               >
-                <Link href="/reservas">Ver Reservas</Link>
+                <Link href="/reservas">Mis Reservas</Link>
               </Button>
             </SignedIn>
             {/* This button is always visible */}
