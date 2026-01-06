@@ -4,7 +4,7 @@
  * This configuration is used to for the Sanity Studio that’s mounted on the `/app/studio/[[...tool]]/page.tsx` route
  */
 
-import { visionTool } from '@sanity/vision'
+// import { visionTool } from '@sanity/vision'
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { esESLocale } from '@sanity/locale-es-es'
@@ -35,7 +35,7 @@ export default defineConfig({
       ...prev,
       {
         name: 'export-data',
-        title: 'Export',
+        title: 'Exportar',
         component: ExportTool,
         icon: ShareIcon
       }

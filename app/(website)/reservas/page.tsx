@@ -1,10 +1,11 @@
-import { getOrders } from "@/lib/actions/get-orders";
 import { ReservationList } from "@/components/reservas/ReservationList";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Metadata } from "next";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
+import { sanityFetch } from "@/sanity/lib/live";
+import { ORDERS_QUERY } from "@/sanity/queries/orders";
 
 export const metadata: Metadata = {
   title: "Mis Reservas | Restaurante Especial",
@@ -18,7 +19,15 @@ export default async function MisReservasPage() {
     redirect("/?error=login_required");
   }
 
-  const orders = await getOrders();
+  const email = user.emailAddresses[0]?.emailAddress;
+
+  const { data: orders } = await sanityFetch({
+    query: ORDERS_QUERY,
+    params: {
+      userId: user.id,
+      userEmail: email,
+    },
+  });
 
   return (
     <div className="flex min-h-screen flex-col font-sans bg-zinc-50 dark:bg-zinc-950 selection:bg-teal-100">

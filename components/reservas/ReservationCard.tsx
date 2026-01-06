@@ -102,11 +102,11 @@ export function ReservationCard({ order }: ReservationCardProps) {
                   <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.total)}</span>
                 </div>
                 <div className="flex justify-between text-zinc-500">
-                  <span>Pagado (50%):</span>
+                  <span>Pagado:</span>
                   <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.amountPaid)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-amber-700">
-                  <span>Pendiente (50%):</span>
+                  <span>Pendiente:</span>
                   <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.amountPending)}</span>
                 </div>
               </div>
