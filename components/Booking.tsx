@@ -50,6 +50,21 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
     }
   }, [user]);
 
+  // Update time based on date selection
+  useEffect(() => {
+    if (date) {
+      const day = date.getDay();
+      // 0 is Sunday
+      if (day === 0) {
+        setTime("7:00 p.m - 8:45 pm");
+      } else {
+        setTime("8:15 p.m - 10:45 pm");
+      }
+    } else {
+      setTime(undefined);
+    }
+  }, [date]);
+
   const bookingSectionRef = useRef<HTMLDivElement>(null);
 
   // Fetch blocked dates when selectedLocationId changes

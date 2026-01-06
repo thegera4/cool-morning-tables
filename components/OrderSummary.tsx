@@ -174,13 +174,14 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-full flex flex-col">
             <div className="flex items-center gap-3 mb-6">
                 <ListChecks className="h-6 w-6 text-brand-brown stroke-[1.5]" />
-                <h3 className="text-brand-teal font-bold text-lg">Resumen y Confirmacion</h3>
+                <h3 className="text-brand-teal font-bold text-lg">Resumen y Confirmación</h3>
             </div>
             <div className="space-y-6 flex-1 text-sm text-gray-800">
                 {(date || time) && (
                     <div className="space-y-1">
                         <h4 className="font-bold text-brand-teal text-xs uppercase tracking-wider">Fecha y hora:</h4>
-                        <p className="font-bold">{date ? format(date, "d / MMMM / yyyy", { locale: es }) : "--"}{time ? ` - ${time} hrs` : ""}</p>
+                        <p className="font-bold">{date ? format(date, "d / MMMM / yyyy", { locale: es }) : "--"}</p>
+                        {time && <p className="font-medium text-gray-600">{time}</p>}
                     </div>
                 )}
                 {(contactInfo.firstName || contactInfo.lastName || contactInfo.email || contactInfo.phone) && (
