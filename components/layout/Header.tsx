@@ -16,6 +16,14 @@ export function Header() {
         </Link>
       </div>
       <div className="flex items-center gap-6">
+        <Link
+          href="/CENA%20COLUMPIOS%202026.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-white text-xs md:text-sm font-medium tracking-wider uppercase hover:underline underline-offset-4"
+        >
+          VER CATALOGO
+        </Link>
         <SignedIn>
           {isReservationsPage ? (
             <Link

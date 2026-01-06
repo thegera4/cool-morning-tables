@@ -2,7 +2,7 @@
 
 import { Location } from "@/lib/data";
 import { ContactInfo } from "@/components/ContactForm";
-import { format } from "date-fns";
+import { format, differenceInCalendarDays, startOfToday } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -154,7 +154,10 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
         return extra ? total + (extra.price || 0) * count : total;
     }, 0);
     const total = locationPrice + extrasTotal;
-    const amountToPay = payDeposit ? total / 2 : total;
+
+    const today = startOfToday();
+    const canPayDeposit = date ? differenceInCalendarDays(date, today) >= 2 : false;
+    const amountToPay = (payDeposit && canPayDeposit) ? total / 2 : total;
 
     const handleIncrement = (id: string, current: number) => { if (current < 10) onUpdateExtra(id, current + 1); };
     const handleDecrement = (id: string, current: number) => { current > 1 ? onUpdateExtra(id, current - 1) : onUpdateExtra(id, 0); };
@@ -233,13 +236,15 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
             </div>
 
             <div className="mt-8 pt-4 border-t border-gray-100">
-                <div className="flex items-start space-x-2 mb-6 p-4 bg-brand-teal/5 rounded-lg border border-brand-teal/10">
-                    <Checkbox id="deposit" checked={payDeposit} onCheckedChange={(checked) => setPayDeposit(checked as boolean)} />
-                    <div className="grid gap-1.5 leading-none">
-                        <label htmlFor="deposit" className="text-sm font-medium leading-none text-brand-teal">Pagar solo el 50% de anticipo</label>
-                        <p className="text-xs text-brand-teal/80">El 50% restante deberá liquidarse 2 días antes de la reserva.</p>
+                {canPayDeposit && (
+                    <div className="flex items-start space-x-2 mb-6 p-4 bg-brand-teal/5 rounded-lg border border-brand-teal/10">
+                        <Checkbox id="deposit" checked={payDeposit} onCheckedChange={(checked) => setPayDeposit(checked as boolean)} />
+                        <div className="grid gap-1.5 leading-none">
+                            <label htmlFor="deposit" className="text-sm font-medium leading-none text-brand-teal">Pagar solo el 50% de anticipo</label>
+                            <p className="text-xs text-brand-teal/80">El 50% restante deberá liquidarse 2 días antes de la reserva.</p>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 <div className="flex justify-between items-center mb-6">
                     <div className="flex flex-col">
