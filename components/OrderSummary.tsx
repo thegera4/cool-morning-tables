@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ListChecks, Minus, Plus } from "lucide-react";
 import { createOrder } from "@/lib/actions/order";
-import { useTransition } from "react";
+import { useTransition, useState } from "react";
 import { ExtraItem } from "@/components/ExtrasSelector";
 import { useStripe, useElements } from "@stripe/react-stripe-js";
 import { toast } from "sonner";
@@ -30,6 +30,7 @@ interface CheckoutButtonProps {
 function CheckoutButton({ isValid, isPending, startTransition, locationId, location, date, extras, extrasData, contactInfo, paymentIntentId, total }: CheckoutButtonProps) {
     const stripe = useStripe();
     const elements = useElements();
+    const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
 
     const handlePayment = async () => {
         if (!stripe || !elements || !isValid || !locationId || !date || !paymentIntentId) { return; }
@@ -83,6 +84,7 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
                     });
 
                     if (result.success) {
+                        setIsPaymentSuccess(true);
                         toast.success("Pago Exitoso! Se ha enviado un email a tu cuenta con los detalles. También puedes revisar en \"MIS RESERVAS\" tu historial. La pagina se actualizará en unos segundos", {
                             className: "!bg-green-50 !text-green-600 !border-green-200",
                             style: { color: 'green' },
@@ -103,16 +105,19 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
         });
     };
 
-    const isDisabled = isPending || !isValid || !stripe;
+    const isDisabled = isPending || !isValid || !stripe || isPaymentSuccess;
 
     return (
         <div className={isDisabled ? "cursor-not-allowed" : ""}>
             <Button
                 onClick={handlePayment}
                 disabled={isDisabled}
-                className="w-full bg-teal-500 hover:bg-teal-600 text-white font-bold h-12 text-base shadow-lg shadow-teal-500/20 hover:cursor-pointer disabled:opacity-50 disabled:pointer-events-none"
+                className={`w-full font-bold h-12 text-base shadow-lg shadow-teal-500/20 hover:cursor-pointer disabled:opacity-50 disabled:pointer-events-none ${isPaymentSuccess
+                        ? "bg-green-500 hover:bg-green-600 text-white"
+                        : "bg-teal-500 hover:bg-teal-600 text-white"
+                    }`}
             >
-                {isPending ? "Procesando..." : "Pagar"}
+                {isPaymentSuccess ? "Pago Completado" : (isPending ? "Procesando..." : "Pagar")}
             </Button>
         </div>
     );
