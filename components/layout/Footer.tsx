@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { SignedIn } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
-import { Facebook, Instagram, MessageCircle } from "lucide-react";
 
 export function Footer() {
     const pathname = usePathname();
@@ -14,7 +13,7 @@ export function Footer() {
             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div className="flex flex-col items-center md:items-start">
                     <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-300 to-white/90">
-                        coolmorning
+                        Cool Morning
                     </Link>
                     <p className="text-[10px] mt-1 text-teal-100">
                         © Copyright Cool Morning.
@@ -35,17 +34,28 @@ export function Footer() {
                     </SignedIn>
                     <span className="text-xs font-bold tracking-widest text-teal-100">CONTACTO:</span>
                     <div className="flex items-center gap-4">
-                        <Link href="#" className="hover:text-teal-200 transition-colors">
-                            <MessageCircle className="h-5 w-5" />
+                        <Link href="https://wa.me/528711390732" target="_blank" rel="noopener noreferrer" className="hover:text-teal-200 transition-colors">
+                            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" />
+                                <path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" />
+                            </svg>
                         </Link>
-                        <Link href="#" className="hover:text-teal-200 transition-colors">
-                            <Facebook className="h-5 w-5" />
+                        <Link href="https://www.facebook.com/CoolMorningLaguna/" target="_blank" rel="noopener noreferrer" className="hover:text-teal-200 transition-colors">
+                            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" />
+                            </svg>
                         </Link>
-                        <Link href="#" className="hover:text-teal-200 transition-colors">
-                            <Instagram className="h-5 w-5" />
+                        <Link href="https://www.instagram.com/coolmorning/" target="_blank" rel="noopener noreferrer" className="hover:text-teal-200 transition-colors">
+                            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M4 4m0 4a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4z" />
+                                <path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+                                <path d="M16.5 7.5l0 .01" />
+                            </svg>
                         </Link>
                     </div>
-                    <span className="text-xs font-bold tracking-widest text-teal-100">COOLMORNING.COM.MX</span>
+                    <Link href="https://coolmorning.com.mx/" target="_blank" rel="noopener noreferrer" className="text-xs font-bold tracking-widest text-teal-100 hover:text-white transition-colors">
+                        COOLMORNING.COM.MX
+                    </Link>
                 </div>
             </div>
         </footer>
