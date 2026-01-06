@@ -12,6 +12,7 @@ import { useTransition, useState } from "react";
 import { ExtraItem } from "@/components/ExtrasSelector";
 import { useStripe, useElements } from "@stripe/react-stripe-js";
 import { toast } from "sonner";
+import confetti from "canvas-confetti";
 
 interface CheckoutButtonProps {
     isValid: boolean | string | null; // Allow null to match usage
@@ -85,6 +86,12 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
 
                     if (result.success) {
                         setIsPaymentSuccess(true);
+                        confetti({
+                            particleCount: 150,
+                            spread: 70,
+                            origin: { y: 0.6 },
+                            zIndex: 9999, // Ensure it's on top of everything
+                        });
                         toast.success("Pago Exitoso! Se ha enviado un email a tu cuenta con los detalles. También puedes revisar en \"MIS RESERVAS\" tu historial. La pagina se actualizará en unos segundos", {
                             className: "!bg-green-50 !text-green-600 !border-green-200",
                             style: { color: 'green' },
