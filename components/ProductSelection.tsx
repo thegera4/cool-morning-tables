@@ -11,7 +11,7 @@ export function ProductSelection({ selectedLocationId, onSelectLocation, product
   return (
     <>
       <div className="mb-8 flex items-center gap-3">
-        <h3 className="text-teal-500 font-bold text-lg">Selecciona tu lugar:</h3>
+        <h3 className="text-brand-teal font-bold text-lg">Selecciona tu lugar:</h3>
       </div>
       {products.length > 0 ? (
         <LocationGrid

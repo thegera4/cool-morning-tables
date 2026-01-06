@@ -51,11 +51,11 @@ export const ORDER_STATUS_CONFIG: Record<OrderStatusValue, OrderStatusConfig> =
   deposito: {
     value: "deposito",
     label: "50%",
-    color: "bg-amber-100 text-amber-800",
+    color: "bg-brand-brown/10 text-brand-brown",
     icon: CreditCard,
     emoji: "🌗",
-    iconColor: "text-amber-600 dark:text-amber-400",
-    iconBgColor: "bg-amber-100 dark:bg-amber-900/30",
+    iconColor: "text-brand-brown dark:text-brand-brown",
+    iconBgColor: "bg-brand-brown/10 dark:bg-brand-brown/30",
   },
 };
 

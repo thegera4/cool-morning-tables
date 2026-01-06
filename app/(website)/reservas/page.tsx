@@ -30,7 +30,7 @@ export default async function MisReservasPage() {
   });
 
   return (
-    <div className="flex min-h-screen flex-col font-sans bg-zinc-50 dark:bg-zinc-950 selection:bg-teal-100">
+    <div className="flex min-h-screen flex-col font-sans bg-zinc-50 dark:bg-zinc-950 selection:bg-brand-teal/20">
       <Header />
       <main className="flex-1 pt-24 pb-12">
         <ReservationList orders={orders} />

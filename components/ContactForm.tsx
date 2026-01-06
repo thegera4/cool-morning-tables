@@ -40,8 +40,8 @@ export function ContactForm({ contactInfo, setContactInfo }: ContactFormProps) {
     return (
         <div className="flex flex-col gap-6 p-6 bg-white rounded-lg shadow-sm border border-gray-100 h-full">
             <div className="flex items-center gap-3 mb-2">
-                <User className="h-6 w-6 text-amber-700 stroke-[1.5]" />
-                <h3 className="text-teal-500 font-bold text-lg">Informacion de contacto</h3>
+                <User className="h-6 w-6 text-brand-brown stroke-[1.5]" />
+                <h3 className="text-brand-teal font-bold text-lg">Informacion de contacto</h3>
             </div>
 
             <div className="grid grid-cols-1 gap-4">

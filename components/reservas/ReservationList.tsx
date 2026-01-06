@@ -52,25 +52,25 @@ export function ReservationList({ orders }: ReservationListProps) {
         <button
           onClick={() => setActiveTab("upcoming")}
           className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === "upcoming"
-            ? "text-amber-700"
+            ? "text-brand-brown"
             : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
             }`}
         >
           Próximas
           {activeTab === "upcoming" && (
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-amber-700 rounded-t-full" />
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-brown rounded-t-full" />
           )}
         </button>
         <button
           onClick={() => setActiveTab("history")}
           className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === "history"
-            ? "text-amber-700"
+            ? "text-brand-brown"
             : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
             }`}
         >
           Historial
           {activeTab === "history" && (
-            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-amber-700 rounded-t-full" />
+            <span className="absolute bottom-0 left-0 w-full h-0.5 bg-brand-brown rounded-t-full" />
           )}
         </button>
       </div>

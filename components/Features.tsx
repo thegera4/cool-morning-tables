@@ -7,9 +7,9 @@ export function Features() {
         {/* Feature 1 */}
         <div className="flex flex-col items-center">
           {/* Icon */}
-          <div className="mb-4 text-amber-700"><Heart className="h-10 w-10 stroke-[1.5]" /></div>
+          <div className="mb-4 text-brand-brown"><Heart className="h-10 w-10 stroke-[1.5]" /></div>
           {/* Title */}
-          <h3 className="text-teal-500 font-bold mb-2">Personalizado</h3>
+          <h3 className="text-brand-teal font-bold mb-2">Personalizado</h3>
           {/* Description */}
           <p className="text-xs text-gray-800 font-medium leading-relaxed max-w-xs">
             Revisa nuestro catalogo y complementa tu renta para hacerlo unico y especial.
@@ -18,9 +18,9 @@ export function Features() {
         {/* Feature 2 */}
         <div className="flex flex-col items-center">
           {/* Icon */}
-          <div className="mb-4 text-amber-700"><AtSign className="h-10 w-10 stroke-[1.5]" /></div>
+          <div className="mb-4 text-brand-brown"><AtSign className="h-10 w-10 stroke-[1.5]" /></div>
           {/* Title */}
-          <h3 className="text-teal-500 font-bold mb-2">En linea</h3>
+          <h3 className="text-brand-teal font-bold mb-2">En linea</h3>
           {/* Description */}
           <p className="text-xs text-gray-800 font-medium leading-relaxed max-w-xs">
             Nuestro sistema de reservas en linea esta disponible 24/7 para ti.
@@ -29,9 +29,9 @@ export function Features() {
         {/* Feature 3 */}
         <div className="flex flex-col items-center">
           {/* Icon */}
-          <div className="mb-4 text-amber-700"><Phone className="h-10 w-10 stroke-[1.5]" /></div>
+          <div className="mb-4 text-brand-brown"><Phone className="h-10 w-10 stroke-[1.5]" /></div>
           {/* Title */}
-          <h3 className="text-teal-500 font-bold mb-2">¿Dudas?</h3>
+          <h3 className="text-brand-teal font-bold mb-2">¿Dudas?</h3>
           {/* Description */}
           <p className="text-xs text-gray-800 font-medium leading-relaxed max-w-xs">
             Si tienes alguna duda o problema, contactanos, estamos para ti.

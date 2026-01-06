@@ -37,7 +37,7 @@ export function HomeClient({ products, extras }: HomeClientProps) {
   const selectedLocation = products.find((p) => p.id === selectedLocationId);
 
   return (
-    <div className="flex min-h-screen flex-col font-sans bg-gray-50 selection:bg-teal-100">
+    <div className="flex min-h-screen flex-col font-sans bg-gray-50 selection:bg-brand-teal/20">
       <Header />
       <main className="flex-1">
         <Hero />

@@ -24,7 +24,7 @@ export function LocationGrid({ selectedLocationId, onSelectLocation, products }:
             className={cn(
               "cursor-pointer transition-all duration-300 border-2 overflow-hidden group hover:shadow-lg p-0 gap-0",
               isSelected
-                ? "border-teal-500 ring-2 ring-teal-500/20 shadow-md transform scale-[1.02]"
+                ? "border-brand-teal ring-2 ring-brand-teal/20 shadow-md transform scale-[1.02]"
                 : "border-transparent hover:border-gray-200"
             )}
             onClick={() => onSelectLocation(location.id)}
@@ -48,7 +48,7 @@ export function LocationGrid({ selectedLocationId, onSelectLocation, products }:
               )}
               {isSelected && (
                 <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md">
-                  <CheckCircle2 className="h-5 w-5 text-teal-500 fill-teal-50" />
+                  <CheckCircle2 className="h-5 w-5 text-brand-teal fill-brand-teal/10" />
                 </div>
               )}
             </div>

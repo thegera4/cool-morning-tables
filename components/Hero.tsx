@@ -26,7 +26,7 @@ export function Hero() {
             {/* This button is only visible to users that are not signed in */}
             <SignedOut>
               <SignInButton mode="modal">
-                <Button className="bg-teal-500 hover:bg-teal-600 text-white rounded-full px-8 h-10 text-xs font-bold tracking-wide uppercase shadow-lg shadow-teal-500/20 hover:cursor-pointer">
+                <Button className="bg-brand-teal hover:bg-brand-teal/90 text-white rounded-full px-8 h-10 text-xs font-bold tracking-wide uppercase shadow-lg shadow-brand-teal/20 hover:cursor-pointer">
                   Inicia Sesion
                 </Button>
               </SignInButton>
@@ -35,7 +35,7 @@ export function Hero() {
             <SignedIn>
               <Button
                 asChild
-                className="bg-teal-500 hover:bg-teal-600 text-white rounded-full px-8 h-10 text-xs font-bold tracking-wide uppercase shadow-lg shadow-teal-500/20"
+                className="bg-brand-teal hover:bg-brand-teal/90 text-white rounded-full px-8 h-10 text-xs font-bold tracking-wide uppercase shadow-lg shadow-brand-teal/20"
               >
                 <Link href="/reservas">Mis Reservas</Link>
               </Button>

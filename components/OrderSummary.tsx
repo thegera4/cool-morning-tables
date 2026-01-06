@@ -112,9 +112,9 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
             <Button
                 onClick={handlePayment}
                 disabled={isDisabled}
-                className={`w-full font-bold h-12 text-base shadow-lg shadow-teal-500/20 hover:cursor-pointer disabled:opacity-50 disabled:pointer-events-none ${isPaymentSuccess
-                        ? "bg-green-500 hover:bg-green-600 text-white"
-                        : "bg-teal-500 hover:bg-teal-600 text-white"
+                className={`w-full font-bold h-12 text-base shadow-lg shadow-brand-teal/20 hover:cursor-pointer disabled:opacity-50 disabled:pointer-events-none ${isPaymentSuccess
+                    ? "bg-green-500 hover:bg-green-600 text-white"
+                    : "bg-brand-teal hover:bg-brand-teal/90 text-white"
                     }`}
             >
                 {isPaymentSuccess ? "Pago Completado" : (isPending ? "Procesando..." : "Pagar")}
@@ -163,19 +163,19 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-full flex flex-col">
             <div className="flex items-center gap-3 mb-6">
-                <ListChecks className="h-6 w-6 text-amber-700 stroke-[1.5]" />
-                <h3 className="text-teal-500 font-bold text-lg">Resumen y Confirmacion</h3>
+                <ListChecks className="h-6 w-6 text-brand-brown stroke-[1.5]" />
+                <h3 className="text-brand-teal font-bold text-lg">Resumen y Confirmacion</h3>
             </div>
             <div className="space-y-6 flex-1 text-sm text-gray-800">
                 {(date || time) && (
                     <div className="space-y-1">
-                        <h4 className="font-bold text-teal-500 text-xs uppercase tracking-wider">Fecha y hora:</h4>
+                        <h4 className="font-bold text-brand-teal text-xs uppercase tracking-wider">Fecha y hora:</h4>
                         <p className="font-bold">{date ? format(date, "d / MMMM / yyyy", { locale: es }) : "--"}{time ? ` - ${time} hrs` : ""}</p>
                     </div>
                 )}
                 {(contactInfo.firstName || contactInfo.lastName || contactInfo.email || contactInfo.phone) && (
                     <div className="space-y-1">
-                        <h4 className="font-bold text-teal-500 text-xs uppercase tracking-wider">Datos de contacto:</h4>
+                        <h4 className="font-bold text-brand-teal text-xs uppercase tracking-wider">Datos de contacto:</h4>
                         <p className="font-bold">{contactInfo.firstName} {contactInfo.lastName}</p>
                         {contactInfo.email && <p className="font-medium text-gray-600">{contactInfo.email}</p>}
                         {contactInfo.phone && <p className="font-medium text-gray-600">{contactInfo.phone}</p>}
@@ -183,7 +183,7 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                 )}
                 {location && (
                     <div className="space-y-1">
-                        <h4 className="font-bold text-teal-500 text-xs uppercase tracking-wider">Lugar:</h4>
+                        <h4 className="font-bold text-brand-teal text-xs uppercase tracking-wider">Lugar:</h4>
                         <div className="flex justify-between">
                             <p className="font-bold">{location.name}</p>
                             <p className="font-bold">${location.price}</p>
@@ -195,7 +195,7 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                 )}
                 {Object.keys(extras).length > 0 && (
                     <div className="space-y-1">
-                        <h4 className="font-bold text-teal-500 text-xs uppercase tracking-wider">Selecciones:</h4>
+                        <h4 className="font-bold text-brand-teal text-xs uppercase tracking-wider">Selecciones:</h4>
                         <div className="space-y-1">
                             {Object.entries(extras).map(([id, count]) => {
                                 const extra = extrasData.find(e => e._id === id);
@@ -226,17 +226,17 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
             </div>
 
             <div className="mt-8 pt-4 border-t border-gray-100">
-                <div className="flex items-start space-x-2 mb-6 p-4 bg-teal-50 rounded-lg border border-teal-100">
+                <div className="flex items-start space-x-2 mb-6 p-4 bg-brand-teal/5 rounded-lg border border-brand-teal/10">
                     <Checkbox id="deposit" checked={payDeposit} onCheckedChange={(checked) => setPayDeposit(checked as boolean)} />
                     <div className="grid gap-1.5 leading-none">
-                        <label htmlFor="deposit" className="text-sm font-medium leading-none text-teal-700">Pagar solo el 50% de anticipo</label>
-                        <p className="text-xs text-teal-600">El 50% restante deberá liquidarse 2 días antes de la reserva.</p>
+                        <label htmlFor="deposit" className="text-sm font-medium leading-none text-brand-teal">Pagar solo el 50% de anticipo</label>
+                        <p className="text-xs text-brand-teal/80">El 50% restante deberá liquidarse 2 días antes de la reserva.</p>
                     </div>
                 </div>
 
                 <div className="flex justify-between items-center mb-6">
                     <div className="flex flex-col">
-                        <h4 className="font-bold text-teal-500 text-lg">Total a pagar:</h4>
+                        <h4 className="font-bold text-brand-teal text-lg">Total a pagar:</h4>
                         {payDeposit && <span className="text-xs text-gray-500">Total de la orden: ${total} mxn</span>}
                     </div>
                     <span className="font-bold text-xl text-gray-900">${amountToPay} mxn</span>
@@ -263,9 +263,9 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                 )}
 
                 <div className="mt-3 space-y-1">
-                    {!date && <p className="text-xs text-amber-600 font-medium flex items-center gap-1">⚠️ Por favor selecciona una fecha</p>}
-                    {!isContactInfoComplete && <p className="text-xs text-amber-600 font-medium flex items-center gap-1">⚠️ Información de contacto incompleta</p>}
-                    {!isStripeComplete && <p className="text-xs text-amber-600 font-medium flex items-center gap-1">⚠️ Información de pago incompleta</p>}
+                    {!date && <p className="text-xs text-brand-brown font-medium flex items-center gap-1">⚠️ Por favor selecciona una fecha</p>}
+                    {!isContactInfoComplete && <p className="text-xs text-brand-brown font-medium flex items-center gap-1">⚠️ Información de contacto incompleta</p>}
+                    {!isStripeComplete && <p className="text-xs text-brand-brown font-medium flex items-center gap-1">⚠️ Información de pago incompleta</p>}
                 </div>
             </div>
         </div>

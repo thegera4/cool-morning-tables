@@ -53,7 +53,7 @@ export function ReservationCard({ order }: ReservationCardProps) {
               )}
             </div>
             {order.status === 'deposito' && (
-              <p className="text-xs text-amber-600 dark:text-amber-500 font-medium mt-1 max-w-[500px] leading-tight">
+              <p className="text-xs text-brand-brown dark:text-brand-brown font-medium mt-1 max-w-[500px] leading-tight">
                 Recuerda que tienes pendiente pagar el 50% del costo total de tu reservación.
               </p>
             )}
@@ -63,13 +63,13 @@ export function ReservationCard({ order }: ReservationCardProps) {
             className="flex items-center gap-2 mb-2 cursor-pointer group"
             onClick={() => setIsExpanded(!isExpanded)}
           >
-            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-amber-700 transition-colors">
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-brand-brown transition-colors">
               {order.orderNumber}
             </h3>
             {isExpanded ? (
-              <ChevronUp className="w-5 h-5 text-zinc-400 group-hover:text-amber-700" />
+              <ChevronUp className="w-5 h-5 text-zinc-400 group-hover:text-brand-brown" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-zinc-400 group-hover:text-amber-700" />
+              <ChevronDown className="w-5 h-5 text-zinc-400 group-hover:text-brand-brown" />
             )}
           </div>
 
@@ -85,11 +85,11 @@ export function ReservationCard({ order }: ReservationCardProps) {
 
           <div className="flex flex-wrap gap-4 mb-4 text-sm text-zinc-600 dark:text-zinc-400">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-amber-700" />
+              <Calendar className="w-4 h-4 text-brand-brown" />
               <span>{formattedDateCapitalized}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-amber-700" />
+              <Clock className="w-4 h-4 text-brand-brown" />
               <span>{reservationTime}</span>
             </div>
           </div>
@@ -105,7 +105,7 @@ export function ReservationCard({ order }: ReservationCardProps) {
                   <span>Pagado:</span>
                   <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.amountPaid)}</span>
                 </div>
-                <div className="flex justify-between font-bold text-amber-700">
+                <div className="flex justify-between font-bold text-brand-brown">
                   <span>Pendiente:</span>
                   <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.amountPending)}</span>
                 </div>

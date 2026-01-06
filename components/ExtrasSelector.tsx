@@ -32,8 +32,8 @@ export function ExtrasSelector({ extras, selectedExtras, onUpdateExtra }: Extras
     return (
         <div className="flex flex-col gap-6 p-6 bg-white rounded-lg shadow-sm border border-gray-100">
             <div className="flex items-center gap-3 mb-2">
-                <Gift className="h-6 w-6 text-amber-700 stroke-[1.5]" />
-                <h3 className="text-teal-500 font-bold text-lg">Extras</h3>
+                <Gift className="h-6 w-6 text-brand-brown stroke-[1.5]" />
+                <h3 className="text-brand-teal font-bold text-lg">Extras</h3>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {extras.map((extra) => {
@@ -46,7 +46,7 @@ export function ExtrasSelector({ extras, selectedExtras, onUpdateExtra }: Extras
                                 id={extra._id}
                                 checked={isSelected}
                                 onCheckedChange={(c) => handleToggle(extra, c as boolean)}
-                                className="data-[state=checked]:bg-teal-500 border-teal-500"
+                                className="data-[state=checked]:bg-brand-teal border-brand-teal"
                             />
                             <Label htmlFor={extra._id} className="text-sm font-medium text-gray-700 cursor-pointer user-select-none">
                                 {extra.name}
