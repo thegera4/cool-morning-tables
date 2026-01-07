@@ -84,7 +84,7 @@ importers:
         specifier: 11.6.12
         version: 11.6.12(@emotion/is-prop-valid@1.4.0)(@sanity/client@7.13.2)(@sanity/icons@3.7.4(react@19.2.3))(@sanity/types@5.1.0(@types/react@19.2.7))(next@16.1.1(@babel/core@7.28.5)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react-is@19.2.3)(react@19.2.3)(sanity@4.22.0(@emotion/is-prop-valid@1.4.0)(@portabletext/sanity-bridge@2.0.0(@types/react@19.2.7))(@types/node@20.19.27)(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(jiti@2.6.1)(lightningcss@1.30.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(styled-components@6.1.19(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2))(styled-components@6.1.19(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(typescript@5.9.3)
       nodemailer:
-        specifier: ^7.0.12
+        specifier: 7.0.12
         version: 7.0.12
       react:
         specifier: 19.2.3
@@ -121,7 +121,7 @@ importers:
         specifier: '20'
         version: 20.19.27
       '@types/nodemailer':
-        specifier: ^7.0.4
+        specifier: 7.0.4
         version: 7.0.4
       '@types/react':
         specifier: '19'
