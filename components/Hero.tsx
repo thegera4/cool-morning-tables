@@ -18,7 +18,7 @@ export function Hero() {
       <div className="absolute inset-0 bg-black/40" /> {/* Overlay for text readability */}
       <div className="relative z-10 container mx-auto px-6 md:px-12 h-full flex flex-col justify-center text-white">
         <div className="max-w-xl mt-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">Experiencias Unicas</h1>
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight text-balance">Experiencias Únicas</h1>
           <p className="text-sm md:text-base text-gray-200 mb-8 max-w-md leading-relaxed">
             Cool Morning es tu aliado perfecto para esas ocasiones especiales con tus seres queridos.
           </p>

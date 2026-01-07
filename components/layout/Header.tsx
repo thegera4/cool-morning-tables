@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import Link from "next/link";
 import Image from "next/image";
@@ -12,7 +12,7 @@ export function Header() {
   return (
     <header className="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 md:px-12">
       <div className="flex items-center">
-        <Link href="/" className="relative h-12 w-48">
+        <Link href="/" className="relative h-10 w-32 md:h-12 md:w-48">
           <Image
             src="/Logo.png"
             alt="Cool Morning Logo"
@@ -22,12 +22,14 @@ export function Header() {
           />
         </Link>
       </div>
-      <div className="flex items-center gap-6">
+
+      {/* Desktop Navigation */}
+      <div className="hidden md:flex items-center gap-6">
         <Link
           href="/CENA%20COLUMPIOS%202026.pdf"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-white text-xs md:text-sm font-medium tracking-wider uppercase hover:underline underline-offset-4"
+          className="text-white text-sm font-medium tracking-wider uppercase hover:underline underline-offset-4"
         >
           VER CATALOGO
         </Link>
@@ -35,14 +37,14 @@ export function Header() {
           {isReservationsPage ? (
             <Link
               href="/"
-              className="text-brand-teal text-xs md:text-sm font-bold tracking-wider uppercase hover:underline underline-offset-4"
+              className="text-brand-teal text-sm font-bold tracking-wider uppercase hover:underline underline-offset-4"
             >
               REGRESAR A PAGINA PRINCIPAL
             </Link>
           ) : (
             <Link
               href="/reservas"
-              className="text-white text-xs md:text-sm font-medium tracking-wider uppercase hover:underline underline-offset-4"
+              className="text-white text-sm font-medium tracking-wider uppercase hover:underline underline-offset-4"
             >
               MIS RESERVAS
             </Link>
@@ -57,6 +59,21 @@ export function Header() {
             </button>
           </SignInButton>
         </SignedOut>
+      </div>
+
+      {/* Mobile Navigation - Only User Button if signed in, otherwise relying on Hero buttons */}
+      <div className="md:hidden flex items-center gap-4">
+        <SignedIn>
+          {isReservationsPage && (
+            <Link
+              href="/"
+              className="text-brand-teal text-xs font-bold tracking-wider uppercase hover:underline underline-offset-4 mr-2"
+            >
+              REGRESAR
+            </Link>
+          )}
+          <UserButton />
+        </SignedIn>
       </div>
     </header>
   );

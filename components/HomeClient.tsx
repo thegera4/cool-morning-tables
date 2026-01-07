@@ -42,7 +42,7 @@ export function HomeClient({ products, extras }: HomeClientProps) {
       <main className="flex-1">
         <Hero />
         <Features />
-        <section className="pb-16 px-6 md:px-12 max-w-6xl mx-auto">
+        <section className="pb-16 px-4 md:px-12 max-w-6xl mx-auto">
           <ProductSelection
             selectedLocationId={selectedLocationId}
             onSelectLocation={setSelectedLocationId}

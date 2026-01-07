@@ -59,6 +59,16 @@ export function ReservationCard({ order }: ReservationCardProps) {
             )}
           </div>
 
+          {/* Mobile Image */}
+          <div className="block sm:hidden w-full h-32 relative mb-4 rounded-lg overflow-hidden">
+            <Image
+              src={imageUrl}
+              alt={product?.name || "Reservation"}
+              fill
+              className="object-cover"
+            />
+          </div>
+
           <div
             className="flex items-center gap-2 mb-2 cursor-pointer group"
             onClick={() => setIsExpanded(!isExpanded)}
