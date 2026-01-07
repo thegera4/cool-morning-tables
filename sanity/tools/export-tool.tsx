@@ -1,4 +1,4 @@
-import { LinkIcon, UserIcon, BasketIcon, ShareIcon } from '@sanity/icons'
+import { UserIcon, BasketIcon } from '@sanity/icons'
 import { Card, Flex, Button, Text, Stack } from '@sanity/ui'
 import { useClient } from 'sanity'
 import React, { useState } from 'react'
@@ -44,21 +44,55 @@ export const ExportTool = () => {
       }`
       const orders = await client.fetch(query)
 
-      // Convert to CSV
-      const headers = ['Order Number', 'Date', 'Customer Name', 'Email', 'Phone', 'Total', 'Paid', 'Pending', 'Status', 'Items', 'Created At']
-      const rows = orders.map((order: any) => [
-        order.orderNumber,
-        order.reservationDate,
-        order.customerName,
-        order.customerEmail,
-        order.customerPhone,
-        order.total,
-        order.amountPaid,
-        order.amountPending,
-        order.status,
-        order.items ? order.items.map((i: any) => `${i.quantity}x ${i.name}`).join('; ') : '',
-        order.createdAt
-      ])
+      // 1. Collect all unique item names
+      const allItemNames = new Set<string>();
+      orders.forEach((order: any) => {
+        if (order.items) {
+          order.items.forEach((item: any) => {
+            if (item.name) allItemNames.add(item.name);
+          });
+        }
+      });
+      const sortedItemNames = Array.from(allItemNames).sort();
+
+      // 2. Create Header Row
+      const fixedHeaders = ['Orden', 'Fecha', 'Cliente', 'Email', 'Teléfono', 'Total', 'Pagado', 'Pendiente', 'Status', 'Fecha de creación'];
+      const headers = [...fixedHeaders, ...sortedItemNames];
+
+      // 3. Create Data Rows
+      const rows = orders.map((order: any) => {
+        // Create a map of this order's items for quick lookup
+        const orderItemsMap = new Map();
+        if (order.items) {
+          order.items.forEach((item: any) => {
+            // If duplicate items exist, sum quantities (though distinct items usually expected)
+            const current = orderItemsMap.get(item.name) || 0;
+            orderItemsMap.set(item.name, current + item.quantity);
+          });
+        }
+
+        // Base fields
+        const baseRow = [
+          order.orderNumber,
+          order.reservationDate,
+          order.customerName,
+          order.customerEmail,
+          order.customerPhone,
+          order.total,
+          order.amountPaid,
+          order.amountPending,
+          order.status,
+          order.createdAt
+        ];
+
+        // Item fields (quantity matches)
+        const itemRow = sortedItemNames.map(itemName => {
+          const qty = orderItemsMap.get(itemName);
+          return qty !== undefined ? qty : ''; // Empty string if not present
+        });
+
+        return [...baseRow, ...itemRow];
+      })
 
       const csvContent = [
         headers.join(','),
@@ -87,7 +121,7 @@ export const ExportTool = () => {
       }`
       const customers = await client.fetch(query)
 
-      const headers = ['Name', 'Email', 'Phone', 'Clerk ID', 'Stripe ID']
+      const headers = ['Nombre', 'Email', 'Teléfono', 'Clerk ID', 'Stripe ID']
       const rows = customers.map((c: any) => [
         c.name,
         c.email,
@@ -115,14 +149,13 @@ export const ExportTool = () => {
     <Card padding={4} height="fill">
       <Flex direction="column" gap={4} align="center" justify="center" height="fill">
         <Stack space={4}>
-          <Text size={4} weight="bold">Export Data</Text>
-          <Text muted>Download your data as CSV files.</Text>
-
+          <Text size={4} weight="bold">Exportar Información</Text>
+          <Text muted>Descarga tus datos como archivos CSV.</Text>
           <Flex gap={3}>
             <Button
               fontSize={2}
               icon={BasketIcon}
-              text="Export Orders"
+              text="Ordenes"
               tone="primary"
               onClick={exportOrders}
               loading={isLoading}
@@ -131,7 +164,7 @@ export const ExportTool = () => {
             <Button
               fontSize={2}
               icon={UserIcon}
-              text="Export Customers"
+              text="Clientes"
               tone="primary"
               onClick={exportCustomers}
               loading={isLoading}
