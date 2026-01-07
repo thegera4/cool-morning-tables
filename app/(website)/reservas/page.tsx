@@ -8,7 +8,7 @@ import { sanityFetch } from "@/sanity/lib/live";
 import { ORDERS_QUERY } from "@/sanity/queries/orders";
 
 export const metadata: Metadata = {
-  title: "Mis Reservas | Restaurante Especial",
+  title: "Mis Reservas | Cool Morning Cenas Románticas",
   description: "Gestiona tus reservaciones y consulta tu historial.",
 };
 

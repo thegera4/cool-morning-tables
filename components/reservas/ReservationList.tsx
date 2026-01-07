@@ -44,7 +44,7 @@ export function ReservationList({ orders }: ReservationListProps) {
     <div className="w-full max-w-5xl mx-auto px-4 sm:px-6">
       <div className="mb-8 pl-1">
         <h1 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">Mis Reservas</h1>
-        <p className="text-zinc-500">Gestiona tus próximas visitas y revisa tu historial de cenas.</p>
+        <p className="text-zinc-500">Gestiona tus próximas visitas y revisa tu historial.</p>
       </div>
 
       {/* Main Tabs (Próximas / Historial) */}
