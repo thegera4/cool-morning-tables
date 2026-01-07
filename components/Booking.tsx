@@ -204,14 +204,14 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
     >
       {/* If user is not signed in, show sign in message and button */}
       <SignedOut>
-        <div className="flex flex-col items-center justify-center py-12 text-center bg-white/50 backdrop-blur-sm rounded-xl border border-white/60 shadow-lg">
-          <h3 className="text-2xl font-bold text-brand-teal mb-4">¡Casi listo para reservar!</h3>
+        <div className="flex flex-col items-center justify-center py-12 text-center bg-white/50 backdrop-blur-sm rounded-xl border border-white/60 shadow-lg px-4 mx-4 sm:mx-0">
+          <h3 className="text-2xl font-bold text-brand-teal mb-4">¡Casi listo!</h3>
           <p className="text-gray-600 mb-8 max-w-md">
-            Para continuar con tu reserva y ver los detalles, por favor inicia sesion o registrate.
+            Para continuar con tu reserva, ver los detalles y poder pagar, por favor inicia sesión o registrate.
           </p>
           <SignInButton mode="modal">
-            <Button className="bg-brand-teal hover:bg-brand-teal/90 text-white font-bold px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all hover:cursor-pointer">
-              Inicia Sesion o Registrate para poder reservar.
+            <Button className="bg-brand-teal hover:bg-brand-teal/90 text-white font-bold px-8 py-6 text-lg rounded-full shadow-lg hover:shadow-xl transition-all hover:cursor-pointer whitespace-normal h-auto leading-tight">
+              Inicia sesión para reservar.
             </Button>
           </SignInButton>
         </div>
