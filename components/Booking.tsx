@@ -132,7 +132,22 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
         const res = await fetch("/api/create-payment-intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ amount: amountToPay }),
+          body: JSON.stringify({
+            amount: amountToPay,
+            metadata: {
+              customerEmail: contactInfo.email,
+              customerName: `${contactInfo.firstName} ${contactInfo.lastName}`,
+              reservationDate: date ? date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : "",
+              time: time,
+              locationName: location.name,
+              locationAddress: ["La Trattoria TRC", "Allende #138 Pte.", "Torreon, Coahuila"],
+              extras: Object.entries(selectedExtras).map(([id, count]) => {
+                const extra = extrasData.find(e => e._id === id);
+                return { name: extra?.name || "Extra", quantity: count, price: extra?.price || 0 };
+              }),
+              totalAmount: total,
+            }
+          }),
         });
         const data = await res.json();
         if (data.clientSecret) {
@@ -143,7 +158,23 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
         await fetch("/api/update-payment-intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymentIntentId, amount: amountToPay }),
+          body: JSON.stringify({
+            paymentIntentId,
+            amount: amountToPay,
+            metadata: {
+              customerEmail: contactInfo.email,
+              customerName: `${contactInfo.firstName} ${contactInfo.lastName}`,
+              reservationDate: date ? date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : "",
+              time: time,
+              locationName: location.name,
+              locationAddress: ["La Trattoria TRC", "Allende #138 Pte.", "Torreon, Coahuila"],
+              extras: Object.entries(selectedExtras).map(([id, count]) => {
+                const extra = extrasData.find(e => e._id === id);
+                return { name: extra?.name || "Extra", quantity: count, price: extra?.price || 0 };
+              }),
+              totalAmount: total,
+            }
+          }),
         });
         // Client secret remains valid
       }

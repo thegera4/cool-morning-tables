@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { amount, currency = "mxn" } = body;
+    const { amount, currency = "mxn", metadata } = body;
 
     // Validating amount
     if (!amount || amount <= 0) {
@@ -40,14 +40,28 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Could not create Stripe customer" }, { status: 500 });
     }
 
+    // Sanitize metadata to ensure it fits Stripe limits (50 keys, 500 chars per value)
+    // We'll stringify complex objects if needed, but for now we expect flat or simple structures.
+    // Important: Stripe metadata values must be strings.
+    const cleanMetadata: Record<string, string> = {
+      clerkUserId: user.id,
+    };
+
+    if (metadata) {
+      if (metadata.reservationDate) cleanMetadata.reservationDate = String(metadata.reservationDate);
+      if (metadata.locationName) cleanMetadata.locationName = String(metadata.locationName);
+      if (metadata.locationAddress) cleanMetadata.locationAddress = JSON.stringify(metadata.locationAddress); // Store array as string
+      if (metadata.extras) cleanMetadata.extras = JSON.stringify(metadata.extras); // Store complex object as string
+      if (metadata.customerName) cleanMetadata.customerName = String(metadata.customerName);
+      if (metadata.time) cleanMetadata.time = String(metadata.time);
+    }
+
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Convert to cents
       currency,
       customer: stripeCustomerId,
       automatic_payment_methods: { enabled: true },
-      metadata: {
-        clerkUserId: user.id,
-      },
+      metadata: cleanMetadata,
     });
 
     return NextResponse.json({
