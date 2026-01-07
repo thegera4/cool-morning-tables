@@ -33,7 +33,7 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
               <div className="w-full h-full cursor-not-allowed"><CalendarDayButton {...props} /></div>
             </span>
           </TooltipTrigger>
-          <TooltipContent><p>No Disponible</p></TooltipContent>
+          <TooltipContent className="bg-brand-brown text-white border-brand-brown [&_svg]:fill-brand-brown [&_svg]:text-brand-brown [&_svg]:bg-brand-brown"><p>No Disponible</p></TooltipContent>
         </Tooltip>
       );
     }
@@ -43,9 +43,9 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
   return (
     <div className="flex flex-col gap-6 p-6 bg-white rounded-lg shadow-sm border border-gray-100">
       {/* Title */}
-      <div className="flex items-center gap-3 mb-2">
+      <div className="flex items-center gap-3">
         <CalendarIcon className="h-6 w-6 text-brand-brown stroke-[1.5]" />
-        <h3 className="text-brand-teal font-bold text-lg">Selecciona tu fecha y hora</h3>
+        <h3 className="text-brand-teal font-bold text-lg">Selecciona tu fecha</h3>
       </div>
       {/* Calendar */}
       <div className="flex flex-col gap-4">
@@ -54,7 +54,7 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
             mode="single"
             selected={date}
             onSelect={setDate}
-            className="rounded-md border shadow-sm w-full flex justify-center"
+            className="w-full flex justify-center data-[selected-single=true]:bg-blue-500"
             classNames={{
               month: "space-y-4 w-full",
               table: "w-full border-collapse space-y-1",

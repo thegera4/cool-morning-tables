@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { SignedIn } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 
@@ -12,8 +13,13 @@ export function Footer() {
         <footer className="w-full bg-brand-teal text-white py-8 px-6 md:px-12">
             <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div className="flex flex-col items-center md:items-start">
-                    <Link href="/" className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-300 to-white/90">
-                        coolmorning
+                    <Link href="/" className="relative h-10 w-40">
+                        <Image
+                            src="/Logo.png"
+                            alt="Cool Morning Logo"
+                            fill
+                            className="object-contain object-left md:object-center lg:object-left"
+                        />
                     </Link>
                     <p className="text-[10px] mt-1 text-white/80">
                         © Copyright Cool Morning.

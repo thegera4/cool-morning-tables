@@ -95,7 +95,7 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
     if (bookingSectionRef.current) {
       setTimeout(() => {
         bookingSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 100);
+      }, 150);
     }
   }, [selectedLocationId]);
 
