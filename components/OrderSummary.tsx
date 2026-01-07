@@ -199,9 +199,19 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                             <p className="font-bold">{location.name}</p>
                             <p className="font-bold">${location.price}</p>
                         </div>
-                        <p className="font-medium text-gray-600">La Trattoria TRC</p>
-                        <p className="font-medium text-gray-600">Allende #138 Pte.</p>
-                        <p className="font-medium text-gray-600">Torreon, Coahuila</p>
+                        {location.name?.toLowerCase().trim() === "alberca privada" ? (
+                            <>
+                                <p className="font-medium text-gray-600">Andrés Villarreal 191</p>
+                                <p className="font-medium text-gray-600">Col. División del Norte</p>
+                                <p className="font-medium text-gray-600">Torreón, Coahuila</p>
+                            </>
+                        ) : (
+                            <>
+                                <p className="font-medium text-gray-600">La Trattoria TRC</p>
+                                <p className="font-medium text-gray-600">Allende #138 Pte.</p>
+                                <p className="font-medium text-gray-600">Torreon, Coahuila</p>
+                            </>
+                        )}
                     </div>
                 )}
                 {Object.keys(extras).length > 0 && (

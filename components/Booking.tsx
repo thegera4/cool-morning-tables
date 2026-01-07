@@ -140,7 +140,9 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
               reservationDate: date ? date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : "",
               time: time,
               locationName: location.name,
-              locationAddress: ["La Trattoria TRC", "Allende #138 Pte.", "Torreon, Coahuila"],
+              locationAddress: location.name?.toLowerCase().trim() === "alberca privada"
+                ? ["Andrés Villarreal 191", "Col. División del Norte", "Torreón, Coahuila"]
+                : ["La Trattoria TRC", "Allende 138 Pte.", "Torreón, Coahuila"],
               extras: Object.entries(selectedExtras).map(([id, count]) => {
                 const extra = extrasData.find(e => e._id === id);
                 return { name: extra?.name || "Extra", quantity: count, price: extra?.price || 0 };
@@ -167,7 +169,9 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
               reservationDate: date ? date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) : "",
               time: time,
               locationName: location.name,
-              locationAddress: ["La Trattoria TRC", "Allende #138 Pte.", "Torreon, Coahuila"],
+              locationAddress: location.name?.toLowerCase().trim() === "alberca privada"
+                ? ["Andrés Villarreal 191", "Col. División del Norte", "Torreón, Coahuila"]
+                : ["La Trattoria TRC", "Allende 138 Pte.", "Torreón, Coahuila"],
               extras: Object.entries(selectedExtras).map(([id, count]) => {
                 const extra = extrasData.find(e => e._id === id);
                 return { name: extra?.name || "Extra", quantity: count, price: extra?.price || 0 };

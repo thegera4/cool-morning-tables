@@ -6,7 +6,7 @@ import { getOrderStatus } from "@/lib/constants/orderStatus";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import Image from "next/image";
-import { Calendar, Clock, ChevronDown, ChevronUp, ClipboardList } from "lucide-react";
+import { Calendar, Clock, ChevronDown, ChevronUp, ClipboardList, MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface ReservationCardProps {
@@ -91,6 +91,15 @@ export function ReservationCard({ order }: ReservationCardProps) {
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-brand-brown" />
               <span>{reservationTime}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-brand-brown" />
+              <span>
+                {product?.name?.toLowerCase().trim() === "alberca privada"
+                  ? "Andrés Villarreal 191, Col. División del Norte"
+                  : "La Trattoria TRC, Allende #138 Pte."
+                }
+              </span>
             </div>
           </div>
 
