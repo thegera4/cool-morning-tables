@@ -20,8 +20,24 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Cool Morning Columpios",
+  title: "Cool Morning Cenas",
   description: "Experiencia Cool Morning en columpios con cena incluida",
+  authors: [{ name: "Juan Gerardo Medellin Ibarra", url: "https://www.jgmedellin.com/" }],
+  generator: "Next.js",
+  keywords: ["Cool Morning", "Cenas", "Columpios", "Cena Incluida", "Experiencias"],
+  openGraph: {
+    title: "Cool Morning Cenas",
+    description: "Experiencia Cool Morning en columpios con cena incluida",
+    siteName: "Cool Morning Cenas",
+    images: [
+      {
+        url: "/Logo.png",
+        width: 1200,
+        height: 630,
+        alt: "Cool Morning Cenas",
+      },
+    ],
+  },
 };
 
 export const viewport: Viewport = {

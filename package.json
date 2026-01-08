@@ -1,6 +1,6 @@
 {
-  "name": "cool-morning-columpios",
-  "version": "0.9.4",
+  "name": "cool-morning-cenas",
+  "version": "0.9.6",
   "private": true,
   "scripts": {
     "dev": "next dev",
