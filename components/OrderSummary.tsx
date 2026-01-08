@@ -26,9 +26,11 @@ interface CheckoutButtonProps {
     contactInfo: ContactInfo;
     paymentIntentId: string;
     total: number;
+    time: string | undefined;
+    locationAddress: string[];
 }
 
-function CheckoutButton({ isValid, isPending, startTransition, locationId, location, date, extras, extrasData, contactInfo, paymentIntentId, total }: CheckoutButtonProps) {
+function CheckoutButton({ isValid, isPending, startTransition, locationId, location, date, extras, extrasData, contactInfo, paymentIntentId, total, time, locationAddress }: CheckoutButtonProps) {
     const stripe = useStripe();
     const elements = useElements();
     const [isPaymentSuccess, setIsPaymentSuccess] = useState(false);
@@ -81,7 +83,10 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
                         totalAmount: total,
                         customerName: `${contactInfo.firstName} ${contactInfo.lastName}`,
                         reservationDate: formattedDate,
-                        customerPhone: contactInfo.phone
+                        customerPhone: contactInfo.phone,
+                        time: time,
+                        locationName: location.name,
+                        locationAddress: locationAddress
                     });
 
                     if (result.success) {
@@ -170,6 +175,17 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
         return (<div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-full flex items-center justify-center text-gray-400 text-sm italic">Selecciona un lugar y fecha para ver el resumen</div>);
     }
 
+    const isAlberca = location.name?.toLowerCase().trim() === "alberca privada";
+    const addressLines = isAlberca ? [
+        "Andrés Villarreal 191",
+        "Col. División del Norte",
+        "Torreón, Coahuila"
+    ] : [
+        "La Trattoria TRC",
+        "Allende 138 Pte.",
+        "Torreon, Coahuila"
+    ];
+
     return (
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 h-full flex flex-col">
             <div className="flex items-center gap-3 mb-6">
@@ -199,19 +215,9 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                             <p className="font-bold">{location.name}</p>
                             <p className="font-bold">${location.price}</p>
                         </div>
-                        {location.name?.toLowerCase().trim() === "alberca privada" ? (
-                            <>
-                                <p className="font-medium text-gray-600">Andrés Villarreal 191</p>
-                                <p className="font-medium text-gray-600">Col. División del Norte</p>
-                                <p className="font-medium text-gray-600">Torreón, Coahuila</p>
-                            </>
-                        ) : (
-                            <>
-                                <p className="font-medium text-gray-600">La Trattoria TRC</p>
-                                <p className="font-medium text-gray-600">Allende #138 Pte.</p>
-                                <p className="font-medium text-gray-600">Torreon, Coahuila</p>
-                            </>
-                        )}
+                        {addressLines.map((line, i) => (
+                            <p key={i} className="font-medium text-gray-600">{line}</p>
+                        ))}
                     </div>
                 )}
                 {Object.keys(extras).length > 0 && (
@@ -278,6 +284,8 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                         contactInfo={contactInfo}
                         paymentIntentId={paymentIntentId}
                         total={total}
+                        time={time}
+                        locationAddress={addressLines}
                     />
                 ) : (
                     <Button disabled className="w-full bg-gray-300 text-white font-bold h-12 text-base cursor-not-allowed">

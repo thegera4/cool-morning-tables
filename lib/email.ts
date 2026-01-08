@@ -1,4 +1,3 @@
-
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
@@ -27,7 +26,7 @@ export async function sendOrderConfirmationEmail(to: string, details: OrderEmail
 
   const extrasHtml = extras.map(extra => `
     <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #555;">
-      <span>${extra.quantity}x ${extra.name}</span>
+      <span>• ${extra.name} - (${extra.quantity})</span>
       <span>$${extra.price * extra.quantity}</span>
     </div>
   `).join('');
@@ -43,10 +42,11 @@ export async function sendOrderConfirmationEmail(to: string, details: OrderEmail
       <div style="padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
         <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por tu compra, ${customerName}!</h2>
         <p>Tu reserva ha sido confirmada. Aquí están los detalles:</p>
-        
-        ${orderNumber ? `<p><strong>Orden:</strong> ${orderNumber}</p>` : ''}
 
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
+
+        <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase;">Orden</h3>
+        <p style="margin: 5px 0; font-weight: bold;">${orderNumber || 'Pendiente (revisa tus reservas en nuestra web)'}</p>
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase;">Fecha y Hora</h3>
         <p style="margin: 5px 0; font-weight: bold;">${date}</p>
@@ -57,7 +57,7 @@ export async function sendOrderConfirmationEmail(to: string, details: OrderEmail
         ${addressHtml}
 
         ${extras.length > 0 ? `
-          <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase; margin-top: 20px;">Adicionales</h3>
+          <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase; margin-top: 20px;">Extras</h3>
           ${extrasHtml}
         ` : ''}
 

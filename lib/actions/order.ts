@@ -6,6 +6,7 @@ import Stripe from "stripe";
 import { getOrCreateCustomer } from "./customer";
 import { randomUUID } from "crypto";
 import { client } from "@/sanity/lib/client";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2025-12-15.clover" as any,
@@ -18,9 +19,12 @@ interface CreateOrderParams {
   customerName?: string;
   reservationDate: string;
   customerPhone?: string;
+  time?: string;
+  locationName: string;
+  locationAddress: string[];
 }
 
-export async function createOrder({ paymentIntentId, items, totalAmount, customerName, reservationDate, customerPhone }: CreateOrderParams) {
+export async function createOrder({ paymentIntentId, items, totalAmount, customerName, reservationDate, customerPhone, time, locationName, locationAddress }: CreateOrderParams) {
   console.log("createOrder action called with:", { paymentIntentId, totalAmount, itemsCount: items.length });
   try {
     const user = await currentUser();
@@ -97,7 +101,6 @@ export async function createOrder({ paymentIntentId, items, totalAmount, custome
     });
 
     // 4. Update Product Blocked Dates
-    // We update the product(s) to include this date in their blockedDates array
     await Promise.all(resolvedItems.map(async (item: any) => {
       if (item._resolved._type === 'product') {
         await writeClient
@@ -107,6 +110,25 @@ export async function createOrder({ paymentIntentId, items, totalAmount, custome
           .commit({ autoGenerateArrayKeys: true });
       }
     }));
+
+    // 5. Send order confirmation email
+    console.log("Sending order confirmation email for order:", orderNumberVal);
+    await sendOrderConfirmationEmail(email, {
+      customerName: customerName || `${user.firstName} ${user.lastName}`,
+      orderNumber: orderNumberVal,
+      date: reservationDate,
+      time: time,
+      locationName: locationName,
+      locationAddress: locationAddress,
+      extras: items.filter((item: any) => item._id !== locationName && item.name !== locationName).map((item: any) => ({
+        name: item.name || "Extra",
+        quantity: item.quantity || 1,
+        price: item.price || 0
+      })),
+      total: totalAmount,
+      amountPaid: amountPaid,
+      amountPending: amountPending
+    });
 
     return { success: true, orderId: order._id };
   } catch (error: any) {
