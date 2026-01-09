@@ -62,7 +62,8 @@ export async function POST(req: Request) {
         parameters: z.object({
           reason: z.string().describe("El motivo de la consulta"),
         }),
-        execute: async () => {
+        // @ts-ignore
+        execute: async ({ reason }: { reason: string }) => {
           const { data: orders } = await sanityFetch({
             query: ORDERS_QUERY,
             params: {
