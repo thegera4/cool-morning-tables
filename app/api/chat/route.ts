@@ -33,6 +33,14 @@ const deepseek = createOpenAI({
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
+  // Debug: Check if API key is loaded
+  console.log("Checking DEEPSEEK_API_KEY...");
+  if (!process.env.DEEPSEEK_API_KEY) {
+    console.error("DEEPSEEK_API_KEY is missing/undefined in process.env");
+  } else {
+    console.log("DEEPSEEK_API_KEY is present. Length:", process.env.DEEPSEEK_API_KEY.length);
+  }
+
   const { messages } = await req.json();
 
   if (!Array.isArray(messages)) {
