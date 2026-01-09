@@ -21,6 +21,9 @@ export function StripeWrapper({ children, clientSecret }: StripeWrapperProps) {
     clientSecret,
     appearance: {
       theme: 'stripe' as const,
+      variables: {
+        colorPrimary: '#04A595',
+      },
     },
   };
 

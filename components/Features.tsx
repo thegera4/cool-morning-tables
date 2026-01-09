@@ -3,6 +3,7 @@ import { HandHeart, Clock8, Hourglass, Sparkles, UsersRound, Mail } from "lucide
 export function Features() {
   return (
     <section className="py-16 px-6 md:px-12 max-w-6xl mx-auto">
+      <h2 className="sr-only">Nuestras Características y Servicios</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
         {/* Feature 1 */}
         <div className="flex flex-col items-center">

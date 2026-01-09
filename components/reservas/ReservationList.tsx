@@ -51,7 +51,7 @@ export function ReservationList({ orders }: ReservationListProps) {
       <div className="flex gap-8 border-b border-zinc-200 dark:border-zinc-800 mb-6">
         <button
           onClick={() => setActiveTab("upcoming")}
-          className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === "upcoming"
+          className={`cursor-pointer pb-3 text-sm font-medium transition-colors relative ${activeTab === "upcoming"
             ? "text-brand-brown"
             : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
             }`}
@@ -63,7 +63,7 @@ export function ReservationList({ orders }: ReservationListProps) {
         </button>
         <button
           onClick={() => setActiveTab("history")}
-          className={`pb-3 text-sm font-medium transition-colors relative ${activeTab === "history"
+          className={`cursor-pointer pb-3 text-sm font-medium transition-colors relative ${activeTab === "history"
             ? "text-brand-brown"
             : "text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300"
             }`}

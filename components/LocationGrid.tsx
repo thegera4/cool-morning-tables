@@ -46,18 +46,13 @@ export function LocationGrid({ selectedLocationId, onSelectLocation, products }:
                   <span className="text-xs font-medium uppercase tracking-wide">Foto no disponible</span>
                 </div>
               )}
-              {isSelected && (
-                <div className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md">
-                  <CheckCircle2 className="h-5 w-5 text-brand-teal fill-brand-teal/10" />
-                </div>
-              )}
             </div>
             <CardContent className="p-4 pb-2">
-              <h4 className="font-bold text-gray-900 text-sm md:text-base line-clamp-1">{location.name}</h4>
-              <p className="font-bold text-gray-900 text-xs mt-1">${location.price}</p>
+              <h4 className="font-bold text-gray-900 text-md md:text-base line-clamp-1">{location.name}</h4>
+              <p className="font-bold text-gray-900 text-sm mt-1">${location.price}</p>
             </CardContent>
             <CardFooter className="p-4 pt-0">
-              <p className="text-[10px] text-gray-500 line-clamp-2">{location.description}</p>
+              <p className="text-sm text-gray-600 line-clamp-2">{location.description}</p>
             </CardFooter>
           </Card>
         );
