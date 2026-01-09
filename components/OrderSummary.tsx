@@ -6,7 +6,7 @@ import { format, differenceInCalendarDays, startOfToday } from "date-fns";
 import { es } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ListChecks, Minus, Plus } from "lucide-react";
+import { ListChecks, Minus, Plus, Loader2 } from "lucide-react";
 import { createOrder } from "@/lib/actions/order";
 import { useTransition, useState } from "react";
 import { ExtraItem } from "@/components/ExtrasSelector";
@@ -129,7 +129,14 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
                     : "bg-brand-teal hover:bg-brand-teal/90 text-white"
                     }`}
             >
-                {isPaymentSuccess ? "Pago Completado" : (isPending ? "Procesando..." : "Pagar")}
+                {isPaymentSuccess ? ("Pago Completado") : 
+                    isPending ? (
+                    <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Procesando...
+                    </>
+                    ) : ("Pagar")
+                }
             </Button>
         </div>
     );
