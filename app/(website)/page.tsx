@@ -13,17 +13,23 @@ const PRODUCTS_QUERY = `*[_type == "product"]{
   "imageUrl": images[0].asset->url
 }`;
 
+import { SETTINGS_QUERY } from "@/sanity/queries/settings";
+
 export default async function Home() {
-  const [productsResult, extrasResult] = await Promise.all([
+  const [productsResult, extrasResult, settingsResult] = await Promise.all([
     sanityFetch({ query: PRODUCTS_QUERY }),
     sanityFetch({ query: ALL_EXTRAS_QUERY }),
+    sanityFetch({ query: SETTINGS_QUERY }),
   ]);
+
+  const isChatEnabled = settingsResult.data?.isChatEnabled ?? true;
 
   return (
     <Suspense>
       <HomeClient
         products={productsResult.data as Location[]}
         extras={extrasResult.data as ExtraItem[]}
+        isChatEnabled={isChatEnabled}
       />
     </Suspense>
   );

@@ -15,9 +15,10 @@ import { useSearchParams, useRouter } from "next/navigation";
 interface HomeClientProps {
   products: Location[];
   extras: ExtraItem[];
+  isChatEnabled: boolean;
 }
 
-export function HomeClient({ products, extras }: HomeClientProps) {
+export function HomeClient({ products, extras, isChatEnabled }: HomeClientProps) {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
 
   const searchParams = useSearchParams();
@@ -38,7 +39,7 @@ export function HomeClient({ products, extras }: HomeClientProps) {
 
   return (
     <div className="flex min-h-screen flex-col font-sans bg-gray-50 selection:bg-brand-teal/20">
-      <Header />
+      <Header isChatEnabled={isChatEnabled} />
       <main className="flex-1">
         <Hero />
         <Features />

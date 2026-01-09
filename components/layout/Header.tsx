@@ -4,8 +4,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
+import { Chat } from "@/components/Chat";
 
-export function Header() {
+interface HeaderProps {
+  isChatEnabled?: boolean;
+}
+
+export function Header({ isChatEnabled = true }: HeaderProps) {
   const pathname = usePathname();
   const isReservationsPage = pathname === "/reservas";
 
@@ -49,6 +54,7 @@ export function Header() {
               MIS RESERVAS
             </Link>
           )}
+          {isChatEnabled && <Chat />}
           <UserButton />
         </SignedIn>
         <SignedOut>
@@ -72,6 +78,7 @@ export function Header() {
               REGRESAR
             </Link>
           )}
+          {isChatEnabled && <Chat />}
           <UserButton />
         </SignedIn>
         <SignedOut>
@@ -83,6 +90,6 @@ export function Header() {
           </SignInButton>
         </SignedOut>
       </div>
-    </header>
+    </header >
   );
 }

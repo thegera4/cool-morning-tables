@@ -1,16 +1,17 @@
 import { ReservationList } from "@/components/reservas/ReservationList";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Metadata } from "next";
 import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { sanityFetch } from "@/sanity/lib/live";
 import { ORDERS_QUERY } from "@/sanity/queries/orders";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Mis Reservas | Cool Morning Cenas Románticas",
   description: "Gestiona tus reservaciones y consulta tu historial.",
 };
+
+import { SETTINGS_QUERY } from "@/sanity/queries/settings";
 
 export default async function MisReservasPage() {
   const user = await currentUser();
@@ -19,19 +20,25 @@ export default async function MisReservasPage() {
     redirect("/?error=login_required");
   }
 
-  const email = user.emailAddresses[0]?.emailAddress;
+  const email = user!!.emailAddresses[0]?.emailAddress;
 
-  const { data: orders } = await sanityFetch({
-    query: ORDERS_QUERY,
-    params: {
-      userId: user.id,
-      userEmail: email,
-    },
-  });
+  const [ordersResult, settingsResult] = await Promise.all([
+    sanityFetch({
+      query: ORDERS_QUERY,
+      params: {
+        userId: user!!.id,
+        userEmail: email,
+      },
+    }),
+    sanityFetch({ query: SETTINGS_QUERY }),
+  ]);
+
+  const orders = ordersResult.data;
+  const isChatEnabled = settingsResult.data?.isChatEnabled ?? false;
 
   return (
     <div className="flex min-h-screen flex-col font-sans bg-zinc-50 dark:bg-zinc-950 selection:bg-brand-teal/20">
-      <Header />
+      <Header isChatEnabled={isChatEnabled} />
       <main className="flex-1 pt-24 pb-12">
         <ReservationList orders={orders} />
       </main>
