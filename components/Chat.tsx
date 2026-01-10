@@ -9,6 +9,7 @@ import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
+import { toast } from "sonner";
 
 export function Chat() {
   const { user } = useUser();
@@ -41,7 +42,13 @@ export function Chat() {
         body: JSON.stringify({ messages: [...messages, userMessage] }),
       });
 
-      if (!response.ok) throw new Error("Network response was not ok");
+      if (!response.ok) {
+        if (response.status === 429) {
+          toast.error("Has alcanzado el límite de 10 mensajes con el asistente por día.");
+          return;
+        }
+        throw new Error("Network response was not ok");
+      }
       if (!response.body) throw new Error("No body");
 
       const reader = response.body.getReader();

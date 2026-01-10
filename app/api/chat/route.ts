@@ -2,6 +2,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { streamText, tool, stepCountIs } from "ai";
 import { z } from "zod";
 import { currentUser } from "@clerk/nextjs/server";
+import { cookies } from "next/headers";
 import { sanityFetch } from "@/sanity/lib/live";
 import { ORDERS_QUERY } from "@/sanity/queries/orders";
 import { PRODUCTS_QUERY } from "@/sanity/queries/products";
@@ -48,6 +49,13 @@ export async function POST(req: Request) {
   }
 
   const email = user.emailAddresses[0]?.emailAddress;
+
+  const cookieStore = await cookies();
+  const usageCount = parseInt(cookieStore.get("chat_usage_count")?.value || "0", 10);
+
+  if (usageCount >= 10) {
+    return new Response("Limit of 10 requests per session reached", { status: 429 });
+  }
 
   const result = streamText({
     model: deepseek.chat("deepseek-chat"),
@@ -136,7 +144,9 @@ export async function POST(req: Request) {
     stopWhen: stepCountIs(5),
   });
 
-  return result.toTextStreamResponse();
+  const response = result.toTextStreamResponse();
+  response.headers.set("Set-Cookie", `chat_usage_count=${usageCount + 1}; Path=/; Max-Age=72000; HttpOnly; SameSite=Strict`);
+  return response;
 }
 
 /**
