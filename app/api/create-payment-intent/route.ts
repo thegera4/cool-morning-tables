@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { currentUser } from "@clerk/nextjs/server";
 import { getOrCreateCustomer } from "@/lib/actions/customer";
+import { calculateOrderTotal } from "@/lib/pricing";
 
 const stripe = process.env.STRIPE_SECRET_KEY as string
   ? new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion: "2024-12-18.acacia" as any })
@@ -20,11 +21,20 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { amount, currency = "mxn", metadata } = body;
+    const { locationId, extras, payDeposit, metadata } = body;
+    const currency = "mxn";
+
+    // Server-side price calculation
+    let amount = 0;
+    try {
+      amount = await calculateOrderTotal(locationId, extras || {}, payDeposit);
+    } catch (err: any) {
+      return NextResponse.json({ error: err.message || "Pricing Error" }, { status: 400 });
+    }
 
     // Validating amount
     if (!amount || amount <= 0) {
-      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid calculated amount" }, { status: 400 });
     }
 
     const email = user.emailAddresses[0]?.emailAddress;

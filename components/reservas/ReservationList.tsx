@@ -78,8 +78,8 @@ export function ReservationList({ orders }: ReservationListProps) {
       {/* List */}
       <div className="space-y-4">
         {currentTabOrders.length > 0 ? (
-          currentTabOrders.map((order) => (
-            <ReservationCard key={order._id} order={order} />
+          currentTabOrders.map((order, index) => (
+            <ReservationCard key={order._id} order={order} priority={index === 0} />
           ))
         ) : (
           <div className="text-center py-12 bg-zinc-50 dark:bg-zinc-900/50 rounded-lg">

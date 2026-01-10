@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Bot, Send, User, Search, ListCheck } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
@@ -86,6 +87,9 @@ export function Chat() {
             <Bot className="h-5 w-5" />
             Asistente Cool
           </SheetTitle>
+          <SheetDescription className="sr-only">
+            Asistente virtual de Cool Morning para ayudarte con reservas y dudas.
+          </SheetDescription>
         </SheetHeader>
 
         <ScrollArea className="flex-1 p-4 bg-gray-50/50 relative z-10">
@@ -116,12 +120,6 @@ export function Chat() {
                         onClick={() => {
                           const msg = "¿Qué lugares tienen disponibles el dia de hoy?";
                           setInput(msg);
-                          // We need to wait a tick for state update or pass directly to submit logic if refactored.
-                          // Ideally we call a separate send function. 
-                          // Let's modify handleSubmit to generic function or just simulate.
-                          // Best approach: call submit with custom text.
-                          // Since handleSubmit takes event, we'll extract logic or simulate.
-                          // Let's refactor handleSubmit to use a dedicated send function below.
                           handleSend(msg);
                         }}
                         className="text-sm bg-white border border-gray-200 hover:border-brand-teal hover:text-brand-teal text-gray-700 px-4 py-2 rounded-full transition-colors duration-200"
@@ -190,11 +188,15 @@ export function Chat() {
                 >
                   {m.role === "user" ? (
                     user?.imageUrl ? (
-                      <img
-                        src={user.imageUrl}
-                        alt="User"
-                        className="h-full w-full rounded-full object-cover"
-                      />
+                      <div className="relative h-8 w-8 rounded-full overflow-hidden">
+                        <Image
+                          src={user.imageUrl}
+                          alt="User"
+                          fill
+                          className="object-cover"
+                          aria-describedby="user-image"
+                        />
+                      </div>
                     ) : (
                       <User className="h-4 w-4" />
                     )

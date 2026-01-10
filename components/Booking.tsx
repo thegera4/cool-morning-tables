@@ -133,7 +133,9 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            amount: amountToPay,
+            locationId: selectedLocationId,
+            extras: selectedExtras,
+            payDeposit: payDeposit,
             metadata: {
               customerEmail: contactInfo.email,
               customerName: `${contactInfo.firstName} ${contactInfo.lastName}`,
@@ -162,7 +164,9 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             paymentIntentId,
-            amount: amountToPay,
+            locationId: selectedLocationId,
+            extras: selectedExtras,
+            payDeposit: payDeposit,
             metadata: {
               customerEmail: contactInfo.email,
               customerName: `${contactInfo.firstName} ${contactInfo.lastName}`,
@@ -253,8 +257,6 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
                 contactInfo={contactInfo}
                 onUpdateExtra={handleUpdateExtra}
                 paymentIntentId={paymentIntentId}
-                // Props for Deposit state
-                // @ts-ignore - Adding dynamic props not yet defined in component interface if I forgot
                 payDeposit={payDeposit}
                 setPayDeposit={setPayDeposit}
                 isStripeComplete={isStripeComplete}

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { currentUser } from "@clerk/nextjs/server";
+import { calculateOrderTotal } from "@/lib/pricing";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2025-12-15.clover" as any,
@@ -14,13 +15,22 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { paymentIntentId, amount, metadata } = body;
+    const { paymentIntentId, locationId, extras, payDeposit, metadata } = body;
 
     if (!paymentIntentId) {
       return NextResponse.json({ error: "PaymentIntent ID required" }, { status: 400 });
     }
+
+    // Server-side price calculation
+    let amount = 0;
+    try {
+      amount = await calculateOrderTotal(locationId, extras || {}, payDeposit);
+    } catch (err: any) {
+      return NextResponse.json({ error: err.message || "Pricing Error" }, { status: 400 });
+    }
+
     if (!amount || amount <= 0) {
-      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid calculated amount" }, { status: 400 });
     }
 
     // Sanitize metadata similar to create

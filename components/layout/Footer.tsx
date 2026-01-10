@@ -19,6 +19,7 @@ export function Footer() {
                             alt="Cool Morning Logo"
                             fill
                             className="object-contain object-center md:object-left"
+                            sizes="160px"
                         />
                     </Link>
                     <p className="text-[10px] mt-1 text-white/80">

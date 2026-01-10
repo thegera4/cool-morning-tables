@@ -11,9 +11,10 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface ReservationCardProps {
   order: any; // Type this properly if possible, or use the inferred type from params
+  priority?: boolean;
 }
 
-export function ReservationCard({ order }: ReservationCardProps) {
+export function ReservationCard({ order, priority = false }: ReservationCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const statusConfig = getOrderStatus(order.status);
   // Find the main product item (not extras)
@@ -66,6 +67,8 @@ export function ReservationCard({ order }: ReservationCardProps) {
               alt={product?.name || "Reservation"}
               fill
               className="object-cover"
+              sizes="(max-width: 640px) 100vw, 1px"
+              loading={priority ? "eager" : "lazy"}
             />
           </div>
 
@@ -146,6 +149,8 @@ export function ReservationCard({ order }: ReservationCardProps) {
               alt={product?.name || "Reservation"}
               fill
               className="object-cover"
+              sizes="(max-width: 640px) 1px, 192px"
+              loading={priority ? "eager" : "lazy"}
             />
           </div>
         </div>

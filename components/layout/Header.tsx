@@ -23,6 +23,7 @@ export function Header({ isChatEnabled = true }: HeaderProps) {
             alt="Cool Morning Logo"
             fill
             className="object-contain object-left"
+            sizes="(max-width: 768px) 128px, 192px"
             priority
           />
         </Link>
