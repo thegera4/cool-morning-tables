@@ -122,19 +122,19 @@ export function Chat() {
                           setInput(msg);
                           handleSend(msg);
                         }}
-                        className="text-sm bg-white border border-gray-200 hover:border-brand-teal hover:text-brand-teal text-gray-700 px-4 py-2 rounded-full transition-colors duration-200"
+                        className="text-sm bg-white border border-gray-200 hover:border-brand-teal hover:text-brand-teal text-gray-700 px-4 py-2 rounded-full transition-colors duration-200 cursor-pointer"
                       >
                         Disponibilidad hoy
                       </button>
                       <button
                         onClick={() => handleSend("¿Donde son las cenas?")}
-                        className="text-sm bg-white border border-gray-200 hover:border-brand-teal hover:text-brand-teal text-gray-700 px-4 py-2 rounded-full transition-colors duration-200"
+                        className="text-sm bg-white border border-gray-200 hover:border-brand-teal hover:text-brand-teal text-gray-700 px-4 py-2 rounded-full transition-colors duration-200 cursor-pointer"
                       >
                         ¿Donde son las cenas?
                       </button>
                       <button
                         onClick={() => handleSend("¿Cuanto cuesta la alberca privada?")}
-                        className="text-sm bg-white border border-gray-200 hover:border-brand-teal hover:text-brand-teal text-gray-700 px-4 py-2 rounded-full transition-colors duration-200"
+                        className="text-sm bg-white border border-gray-200 hover:border-brand-teal hover:text-brand-teal text-gray-700 px-4 py-2 rounded-full transition-colors duration-200 cursor-pointer"
                       >
                         Precio de alberca privada
                       </button>
@@ -149,19 +149,19 @@ export function Chat() {
                     <div className="flex flex-wrap gap-2 justify-center">
                       <button
                         onClick={() => handleSend("¿Me puedes listar todas mis reservas próximas?")}
-                        className="text-sm bg-brand-brown/5 border border-brand-brown/20 hover:border-brand-brown text-brand-brown px-4 py-2 rounded-full transition-colors duration-200"
+                        className="text-sm bg-brand-brown/5 border border-brand-brown/20 hover:border-brand-brown text-brand-brown px-4 py-2 rounded-full transition-colors duration-200 cursor-pointer"
                       >
                         Listar reservas próximas
                       </button>
                       <button
                         onClick={() => handleSend("¿Me puedes dar información sobre mi próxima reserva?")}
-                        className="text-sm bg-brand-brown/5 border border-brand-brown/20 hover:border-brand-brown text-brand-brown px-4 py-2 rounded-full transition-colors duration-200"
+                        className="text-sm bg-brand-brown/5 border border-brand-brown/20 hover:border-brand-brown text-brand-brown px-4 py-2 rounded-full transition-colors duration-200 cursor-pointer"
                       >
                         Próxima reserva
                       </button>
                       <button
                         onClick={() => handleSend("¿Me puedes decir cual fue el total de mi reserva del dia de ayer?")}
-                        className="text-sm bg-brand-brown/5 border border-brand-brown/20 hover:border-brand-brown text-brand-brown px-4 py-2 rounded-full transition-colors duration-200"
+                        className="text-sm bg-brand-brown/5 border border-brand-brown/20 hover:border-brand-brown text-brand-brown px-4 py-2 rounded-full transition-colors duration-200 cursor-pointer"
                       >
                         Total de mi reserva de ayer
                       </button>
@@ -268,7 +268,7 @@ export function Chat() {
               type="submit"
               size="icon"
               disabled={isLoading || !input.trim()}
-              className="bg-brand-teal hover:bg-brand-teal/90 text-white shrink-0"
+              className="bg-brand-teal hover:bg-brand-teal/90 text-white shrink-0 cursor-pointer"
             >
               <Send className="h-4 w-4" />
               <span className="sr-only">Enviar</span>
