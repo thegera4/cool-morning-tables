@@ -81,9 +81,9 @@ export async function POST(req: Request) {
     -Por ejemplo, si vas a dar una respuesta con la información de una reserva, usa este formato siempre:
       📋 Numero de reserva: {numero de la reserva}
       📅 Fecha: {fecha de la reserva}
-      🕘 Hora: {hora de la reserva}
-      📍 Lugar de la reserva: {direccion del restaurante (La Trattoria, Allende 138 Pte. Torreon, Coahuila) o o de la alberca (Andrés Villarreal 191, Col. División del Norte, Torreón, Coahuila), dependiendo del lugar seleccionado}
-      📝 Incluye: {lista de los extras y productosque se incluyen en la reserva con sus cantidades}
+      🕘 Hora: Si la reserva es para Martes - Sábado: 8:15 p.m a 10:45 pm. Si la reserva es para Domingo: 7:00 p.m a 8:45 pm.
+      📍 Lugar de la reserva: Si la reserva es la Alberca Privada: Andrés Villarreal 191, Col. División del Norte, Torreón, Coahuila. Si es cualquier otro lugar: La Trattoria, Allende 138 Pte. Torreón, Coahuila.
+      📝 Incluye: {lista de los extras y productos que se incluyen en la reserva con sus cantidades}
       💳 Cantidad pagada: {cantidad pagada}
       💵 Cantidad restante: {cantidad restante}
     
