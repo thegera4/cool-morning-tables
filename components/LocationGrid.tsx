@@ -4,8 +4,8 @@
 import Image from "next/image";
 import { Location } from "@/lib/data";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { CheckCircle2, ImageOff } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { ImageOff } from "lucide-react";
+import { cn, formatCurrency } from "@/lib/utils";
 
 interface LocationGridProps {
   selectedLocationId: string | null;
@@ -49,7 +49,7 @@ export function LocationGrid({ selectedLocationId, onSelectLocation, products }:
             </div>
             <CardContent className="p-4 pb-2">
               <h4 className="font-bold text-gray-900 text-md md:text-base line-clamp-1">{location.name}</h4>
-              <p className="font-bold text-gray-900 text-sm mt-1">${location.price}</p>
+              <p className="font-bold text-gray-900 text-sm mt-1">{formatCurrency(location.price)}</p>
             </CardContent>
             <CardFooter className="p-4 pt-0">
               <p className="text-sm text-gray-600 line-clamp-2">{location.description}</p>

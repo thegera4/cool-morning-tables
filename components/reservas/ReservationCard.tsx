@@ -8,6 +8,7 @@ import { es } from "date-fns/locale";
 import Image from "next/image";
 import { Calendar, Clock, ChevronDown, ChevronUp, ClipboardList, MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/utils";
 
 interface ReservationCardProps {
   order: any; // Type this properly if possible, or use the inferred type from params
@@ -121,21 +122,21 @@ export function ReservationCard({ order, priority = false }: ReservationCardProp
               <div className="space-y-1 text-sm">
                 <div className="flex justify-between text-zinc-500">
                   <span>Total reservación:</span>
-                  <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.total)}</span>
+                  <span>{formatCurrency(order.total)}</span>
                 </div>
                 <div className="flex justify-between text-zinc-500">
                   <span>Pagado:</span>
-                  <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.amountPaid)}</span>
+                  <span>{formatCurrency(order.amountPaid)}</span>
                 </div>
                 <div className="flex justify-between font-bold text-brand-brown">
                   <span>Pendiente:</span>
-                  <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.amountPending)}</span>
+                  <span>{formatCurrency(order.amountPending)}</span>
                 </div>
               </div>
             ) : (
               <div className="flex justify-between font-bold text-zinc-900 dark:text-zinc-100">
                 <span>Total pagado:</span>
-                <span>{new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN' }).format(order.total)}</span>
+                <span>{formatCurrency(order.total)}</span>
               </div>
             )}
           </div>
