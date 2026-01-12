@@ -13,6 +13,7 @@ import { ExtraItem } from "@/components/ExtrasSelector";
 import { useStripe, useElements } from "@stripe/react-stripe-js";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
+import { formatCurrency } from "@/lib/utils";
 
 interface CheckoutButtonProps {
     isValid: boolean | string | null; // Allow null to match usage
@@ -129,12 +130,12 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
                     : "bg-brand-teal hover:bg-brand-teal/90 text-white"
                     }`}
             >
-                {isPaymentSuccess ? ("Pago Completado") : 
+                {isPaymentSuccess ? ("Pago Completado") :
                     isPending ? (
-                    <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Procesando...
-                    </>
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Procesando...
+                        </>
                     ) : ("Pagar")
                 }
             </Button>
@@ -220,7 +221,7 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                         <h4 className="font-bold text-brand-teal text-xs uppercase tracking-wider">Lugar:</h4>
                         <div className="flex justify-between">
                             <p className="font-bold">{location.name}</p>
-                            <p className="font-bold">${location.price}</p>
+                            <p className="font-bold">{formatCurrency(location.price)}</p>
                         </div>
                         {addressLines.map((line, i) => (
                             <p key={i} className="font-medium text-gray-600">{line}</p>
@@ -250,7 +251,7 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                                                 </div>
                                             )}
                                         </div>
-                                        <span>{extra.price ? `$${extra.price * count}` : '-'}</span>
+                                        <span>{extra.price ? formatCurrency(extra.price * count) : '-'}</span>
                                     </div>
                                 );
                             })}
@@ -273,9 +274,9 @@ export function OrderSummary({ locationId, location, date, time, extras, extrasD
                 <div className="flex justify-between items-center mb-6">
                     <div className="flex flex-col">
                         <h4 className="font-bold text-brand-teal text-lg">Total a pagar:</h4>
-                        {payDeposit && <span className="text-xs text-gray-500">Total de la orden: ${total} mxn</span>}
+                        {payDeposit && <span className="text-xs text-gray-500">Total de la orden: {formatCurrency(total)} mxn</span>}
                     </div>
-                    <span className="font-bold text-xl text-gray-900">${amountToPay} mxn</span>
+                    <span className="font-bold text-xl text-gray-900">{formatCurrency(amountToPay)} mxn</span>
                 </div>
 
                 {paymentIntentId && date ? (
