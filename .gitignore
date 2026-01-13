@@ -42,3 +42,7 @@ next-env.d.ts
 
 # settings
 .vscode
+
+# playwright
+*playwright/
+*playwright-report/
