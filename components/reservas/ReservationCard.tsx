@@ -37,6 +37,11 @@ export function ReservationCard({ order, priority = false }: ReservationCardProp
 
   const imageUrl = product?.images?.[0] ? urlFor(product.images[0]).url() : "/placeholder.png";
 
+  // Payment status logic for title and icons colors
+  const isPaid = statusConfig.value === 'pagada';
+  const accentColorClass = isPaid ? "text-brand-teal" : "text-brand-brown";
+  const hoverColorClass = isPaid ? "group-hover:text-brand-teal" : "group-hover:text-brand-brown";
+
   return (
     <Card className="overflow-hidden border-none shadow-sm bg-white dark:bg-zinc-900 mb-4 transition-all">
       <CardContent className="p-0 sm:flex items-start">
@@ -77,13 +82,13 @@ export function ReservationCard({ order, priority = false }: ReservationCardProp
             className="flex items-center gap-2 mb-2 cursor-pointer group"
             onClick={() => setIsExpanded(!isExpanded)}
           >
-            <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-brand-brown transition-colors">
+            <h3 className={`text-xl font-bold text-zinc-900 dark:text-zinc-100 ${hoverColorClass} transition-colors`}>
               {order.orderNumber}
             </h3>
             {isExpanded ? (
-              <ChevronUp className="w-5 h-5 text-zinc-400 group-hover:text-brand-brown" />
+              <ChevronUp className={`w-5 h-5 text-zinc-400 ${hoverColorClass}`} />
             ) : (
-              <ChevronDown className="w-5 h-5 text-zinc-400 group-hover:text-brand-brown" />
+              <ChevronDown className={`w-5 h-5 text-zinc-400 ${hoverColorClass}`} />
             )}
           </div>
 
@@ -99,15 +104,15 @@ export function ReservationCard({ order, priority = false }: ReservationCardProp
 
           <div className="flex flex-wrap gap-4 mb-4 text-sm text-zinc-600 dark:text-zinc-400">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-brand-brown" />
+              <Calendar className={`w-4 h-4 ${accentColorClass}`} />
               <span>{formattedDateCapitalized}</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-brand-brown" />
+              <Clock className={`w-4 h-4 ${accentColorClass}`} />
               <span>{reservationTime}</span>
             </div>
             <div className="flex items-center gap-2">
-              <MapPin className="w-4 h-4 text-brand-brown" />
+              <MapPin className={`w-4 h-4 ${accentColorClass}`} />
               <span>
                 {product?.name?.toLowerCase().trim() === "alberca privada"
                   ? "Andrés Villarreal 191, Col. División del Norte"

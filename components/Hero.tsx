@@ -3,12 +3,17 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
 
-/** Hero section includes a background image, a heading, a subheading, and two buttons */
-export function Hero() {
+interface HeroProps {
+  title?: string;
+  description?: string;
+  imageUrl?: string;
+}
+
+export function Hero({ title, description, imageUrl }: HeroProps) {
   return (
     <section className="relative h-[600px] w-full overflow-hidden">
       <Image
-        src="/hero-bg.png"
+        src={imageUrl || "/hero-bg.png"}
         alt="Romantic Dinner"
         fill
         className="object-cover object-center"
@@ -18,16 +23,16 @@ export function Hero() {
       <div className="absolute inset-0 bg-black/40" /> {/* Overlay for text readability */}
       <div className="relative z-10 container mx-auto px-6 md:px-12 h-full flex flex-col justify-center text-white">
         <div className="max-w-xl mt-12">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight text-balance">Experiencias Únicas</h1>
+          <h1 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight text-balance">{title || "Experiencias Únicas"}</h1>
           <p className="text-sm md:text-base text-gray-200 mb-8 max-w-md leading-relaxed">
-            Cool Morning es tu aliado perfecto para esas ocasiones especiales con tus seres queridos.
+            {description || "Cool Morning es tu aliado perfecto para esas ocasiones especiales con tus seres queridos."}
           </p>
           <div className="flex flex-wrap gap-4">
             {/* This button is only visible to users that are not signed in */}
             <SignedOut>
               <SignInButton mode="modal">
                 <Button className="bg-brand-teal hover:bg-brand-teal/90 text-white rounded-full px-8 h-10 text-xs font-bold tracking-wide uppercase shadow-lg shadow-brand-teal/20 hover:cursor-pointer">
-                  Inicia Sesion
+                  Inicia Sesión
                 </Button>
               </SignInButton>
             </SignedOut>
