@@ -22,14 +22,12 @@ export default async function Home() {
     sanityFetch({ query: SETTINGS_QUERY }),
   ]);
 
-  const isChatEnabled = settingsResult.data?.isChatEnabled ?? true;
-
   return (
     <Suspense>
       <HomeClient
         products={productsResult.data as Location[]}
         extras={extrasResult.data as ExtraItem[]}
-        isChatEnabled={isChatEnabled}
+        settings={settingsResult.data}
       />
     </Suspense>
   );

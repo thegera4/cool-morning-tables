@@ -15,10 +15,10 @@ import { useSearchParams, useRouter } from "next/navigation";
 interface HomeClientProps {
   products: Location[];
   extras: ExtraItem[];
-  isChatEnabled: boolean;
+  settings: any; // Type this properly if possible, e.g. SettingsPayload
 }
 
-export function HomeClient({ products, extras, isChatEnabled }: HomeClientProps) {
+export function HomeClient({ products, extras, settings }: HomeClientProps) {
   const [selectedLocationId, setSelectedLocationId] = useState<string | null>(null);
 
   const searchParams = useSearchParams();
@@ -39,15 +39,21 @@ export function HomeClient({ products, extras, isChatEnabled }: HomeClientProps)
 
   return (
     <div className="flex min-h-screen flex-col font-sans bg-gray-50 selection:bg-brand-teal/20">
-      <Header isChatEnabled={isChatEnabled} />
+      <Header isChatEnabled={settings?.isChatEnabled ?? true} />
       <main className="flex-1">
-        <Hero />
-        <Features />
+        <Hero
+          title={settings?.heroTitle}
+          description={settings?.heroDescription}
+          imageUrl={settings?.heroImageUrl}
+        />
+        <Features features={settings?.features} />
         <section className="pb-16 px-4 md:px-12 max-w-6xl mx-auto">
           <ProductSelection
             selectedLocationId={selectedLocationId}
             onSelectLocation={setSelectedLocationId}
             products={products}
+            title={settings?.productSelectionTitle}
+            description={settings?.productSelectionDescription}
           />
           {selectedLocationId && selectedLocation && (
             <Booking
