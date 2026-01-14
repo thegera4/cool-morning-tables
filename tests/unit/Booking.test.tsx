@@ -1,5 +1,5 @@
-import { render, screen, waitFor } from '@testing-library/react'; // Add waitFor
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, waitFor, act } from '@testing-library/react'; // Add waitFor and act
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { Booking } from '@/components/Booking';
 
 // Mock child components
@@ -66,7 +66,16 @@ const mockExtras = [
 describe('Booking Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.useFakeTimers();
+    // Mock scrollIntoView which is not implemented in JSDOM
+    window.HTMLElement.prototype.scrollIntoView = vi.fn();
   });
+
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
 
   it('renders sign-in prompt when user is signed out', () => {
     mockUseUser.mockReturnValue({ user: null, isLoaded: true });
@@ -76,6 +85,13 @@ describe('Booking Component', () => {
     expect(screen.getByText('¡Casi listo!')).toBeDefined();
     // Use more specific selector for the button to avoid ambiguity
     expect(screen.getByRole('button', { name: /Inicia sesión/i })).toBeDefined();
+
+    // Advance timers and wait for any effects
+    act(() => {
+      vi.runAllTimers();
+    });
+
+
     // Should not render booking components
     expect(screen.queryByTestId('booking-calendar')).toBeNull();
   });
@@ -94,5 +110,12 @@ describe('Booking Component', () => {
     expect(screen.getByTestId('contact-form')).toBeDefined();
     expect(screen.getByTestId('extras-selector')).toBeDefined();
     expect(screen.getByTestId('order-summary')).toBeDefined();
+
+    // Advance timers and wait for any effects
+    act(() => {
+      vi.runAllTimers();
+    });
+
+
   });
 });

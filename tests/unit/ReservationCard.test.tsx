@@ -17,7 +17,13 @@ vi.mock('lucide-react', () => ({
 
 // Mock Image component
 vi.mock('next/image', () => ({
-  default: ({ fill, ...props }: any) => <img {...props} data-fill={fill} />,
+  default: ({ fill, priority, loading, ...props }: any) => (
+    <img
+      {...props}
+      data-fill={fill?.toString()}
+      loading={loading || (priority ? 'eager' : 'lazy')}
+    />
+  ),
 }));
 
 // Mock Sanity image builder
