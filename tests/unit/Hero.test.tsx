@@ -19,7 +19,13 @@ vi.mock('@clerk/nextjs', () => ({
 
 // Mock Image
 vi.mock('next/image', () => ({
-  default: (props: any) => <img {...props} />,
+  default: ({ fill, priority, ...props }: any) => (
+    <img
+      {...props}
+      data-fill={fill?.toString()}
+      loading={priority ? 'eager' : 'lazy'}
+    />
+  ),
 }));
 
 describe('Hero Component', () => {

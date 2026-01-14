@@ -2,11 +2,19 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { Features } from '@/components/Features';
 
-// Mock Lucide icons with a Proxy to handle any icon import
+// Mock all Lucide icons used in Features
 vi.mock('lucide-react', () => {
-  return new Proxy({}, {
-    get: (target, prop) => (props: any) => <svg data-testid={`icon-${String(prop)}`} {...props} />
+  const icons = [
+    'HandHeart', 'Clock8', 'Hourglass', 'Sparkles', 'UsersRound', 'Mail',
+    'Heart', 'Gift', 'Music', 'Utensils', 'Wine', 'Cake', 'Camera',
+    'Calendar', 'MapPin', 'CreditCard', 'Info', 'ShieldCheck', 'Star',
+    'Phone', 'Car', 'Moon', 'Sun', 'Flower', 'Gem', 'PartyPopper'
+  ];
+  const mock: Record<string, any> = {};
+  icons.forEach(icon => {
+    mock[icon] = (props: any) => <svg data-testid={`icon-${icon}`} {...props} />;
   });
+  return mock;
 });
 
 describe('Features Component', () => {
