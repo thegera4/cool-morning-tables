@@ -4,13 +4,16 @@ import { Booking } from '@/components/Booking';
 import { client } from '@/sanity/lib/client';
 
 // Mock child components
+// Mock child components
+const MockBookingCalendar = vi.fn(({ setDate }: any) => (
+  <div data-testid="booking-calendar">
+    <button onClick={() => setDate(new Date('2024-01-14'))}>Set Weekday</button>
+    <button onClick={() => setDate(new Date('2024-01-14T00:00:00'))}>Set Sunday</button>
+  </div>
+));
+
 vi.mock('@/components/BookingCalendar', () => ({
-  BookingCalendar: ({ setDate }: any) => (
-    <div data-testid="booking-calendar">
-      <button onClick={() => setDate(new Date('2024-01-14'))}>Set Weekday</button>
-      <button onClick={() => setDate(new Date('2024-01-14T00:00:00'))}>Set Sunday</button>
-    </div>
-  ),
+  BookingCalendar: (props: any) => <MockBookingCalendar {...props} />,
 }));
 vi.mock('@/components/ContactForm', () => ({
   ContactForm: () => <div data-testid="contact-form">ContactForm</div>,
@@ -134,28 +137,45 @@ describe('Booking Component', () => {
     expect(global.fetch).toHaveBeenCalled();
   });
 
-  it('handles blocked dates from Sanity', async () => {
-    vi.useRealTimers();
-    (client.fetch as any).mockResolvedValue(['2024-01-20', '2024-01-21']);
+  it('handles blocked dates from props', async () => {
     mockUseUser.mockReturnValue({ user: { id: 'u1' }, isLoaded: true });
 
-    render(<Booking selectedLocationId="loc1" location={mockLocation} extrasData={mockExtras} />);
+    const locationWithBlockedDates = {
+      ...mockLocation,
+      blockedDates: ['2024-01-20', '2024-01-21'],
+    };
 
-    await waitFor(() => {
-      expect(client.fetch).toHaveBeenCalled();
-    }, { timeout: 2000 });
+    render(<Booking selectedLocationId="loc1" location={locationWithBlockedDates} extrasData={mockExtras} />);
+
+    // Verify that the mock was called with the correct props
+    const calls = MockBookingCalendar.mock.calls;
+    const lastCallProps = calls[calls.length - 1][0];
+
+    expect(lastCallProps).toEqual(expect.objectContaining({
+      blockedDates: expect.arrayContaining([expect.any(Date), expect.any(Date)])
+    }));
+
+    // Verify concrete date values
+    // Verify concrete date values
+
+    expect(lastCallProps.blockedDates).toHaveLength(2);
+    expect(lastCallProps.blockedDates[0].toISOString()).toContain('2024-01-20');
   });
 
-  it('handles empty blocked dates from Sanity', async () => {
-    vi.useRealTimers();
-    (client.fetch as any).mockResolvedValue(null);
+  it('handles empty blocked dates', async () => {
     mockUseUser.mockReturnValue({ user: { id: 'u1' }, isLoaded: true });
 
-    render(<Booking selectedLocationId="loc1" location={mockLocation} extrasData={mockExtras} />);
+    const locationWithNoBlockedDates = {
+      ...mockLocation,
+      blockedDates: [],
+    };
 
-    await waitFor(() => {
-      expect(client.fetch).toHaveBeenCalled();
-    });
+    render(<Booking selectedLocationId="loc1" location={locationWithNoBlockedDates} extrasData={mockExtras} />);
+
+    const lastCall = MockBookingCalendar.mock.calls[MockBookingCalendar.mock.calls.length - 1];
+    expect(lastCall[0]).toEqual(expect.objectContaining({
+      blockedDates: []
+    }));
   });
 
   it('handles adding and removing extras', async () => {
