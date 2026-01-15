@@ -9,7 +9,6 @@ import { PaymentForm } from "@/components/PaymentForm";
 import { ExtrasSelector } from "@/components/ExtrasSelector";
 import { OrderSummary } from "@/components/OrderSummary";
 import { StripeWrapper } from "@/components/StripeWrapper";
-import { client } from "@/sanity/lib/client";
 import { Location } from "@/lib/data";
 import { ExtraItem } from "@/components/ExtrasSelector";
 
@@ -67,28 +66,18 @@ export function Booking({ selectedLocationId, location, extrasData }: BookingPro
 
   const bookingSectionRef = useRef<HTMLDivElement>(null);
 
-  // Fetch blocked dates when selectedLocationId changes
+  // Compute blocked dates from location prop
   useEffect(() => {
-    const fetchBlockedDates = async () => {
-      if (!selectedLocationId) return;
-      try {
-        const query = `*[_type == "product" && slug.current == $slug][0].blockedDates`;
-        const result = await client.fetch(query, { slug: selectedLocationId });
-
-        if (result) {
-          setBlockedDates(result.map((d: string) => {
-            const [year, month, day] = d.split('-').map(Number);
-            return new Date(year, month - 1, day);
-          }));
-        } else {
-          setBlockedDates([]);
-        }
-      } catch (error) {
-        console.error("Error fetching blocked dates:", error);
-      }
-    };
-    fetchBlockedDates();
-  }, [selectedLocationId]);
+    if (location?.blockedDates) {
+      const dates = location.blockedDates.map((d: string) => {
+        const [year, month, day] = d.split('-').map(Number);
+        return new Date(year, month - 1, day);
+      });
+      setBlockedDates(dates);
+    } else {
+      setBlockedDates([]);
+    }
+  }, [location]);
 
   // Auto-scroll to booking section when mounted (which happens when location is selected)
   useEffect(() => {

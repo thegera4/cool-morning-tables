@@ -7,7 +7,7 @@ import { ProductSelection } from "@/components/ProductSelection";
 import { Hero } from "@/components/Hero";
 import { Features } from "@/components/Features";
 import { Booking } from "@/components/Booking";
-import { Location } from "@/lib/data";
+import { Location, Settings } from "@/lib/data";
 import { ExtraItem } from "@/components/ExtrasSelector";
 import { toast } from "sonner";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -15,7 +15,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 interface HomeClientProps {
   products: Location[];
   extras: ExtraItem[];
-  settings: any; // Type this properly if possible, e.g. SettingsPayload
+  settings: Settings | null;
 }
 
 export function HomeClient({ products, extras, settings }: HomeClientProps) {

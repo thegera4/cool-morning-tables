@@ -1,19 +1,12 @@
-import { sanityFetch } from "@/sanity/lib/live";
-import { HomeClient } from "@/components/HomeClient";
-import { ALL_EXTRAS_QUERY } from "@/sanity/queries/extras";
-import { Location } from "@/lib/data";
-import { ExtraItem } from "@/components/ExtrasSelector";
 import { Suspense } from "react";
-
-const PRODUCTS_QUERY = `*[_type == "product"]{
-  "id": slug.current,
-  name,
-  price,
-  description,
-  "imageUrl": images[0].asset->url
-}`;
-
+import { HomeClient } from "@/components/HomeClient";
+import { ExtraItem } from "@/components/ExtrasSelector";
+import { sanityFetch } from "@/sanity/lib/live";
+import { PRODUCTS_QUERY } from "@/sanity/queries/products";
+import { ALL_EXTRAS_QUERY } from "@/sanity/queries/extras";
 import { SETTINGS_QUERY } from "@/sanity/queries/settings";
+import { Location } from "@/lib/data";
+
 
 export default async function Home() {
   const [productsResult, extrasResult, settingsResult] = await Promise.all([
