@@ -4,6 +4,7 @@ export interface Location {
     price: number;
     description: string;
     imageUrl: string;
+    blockedDates?: string[];
 }
 
 export interface Extra {
@@ -85,6 +86,19 @@ export const EXTRAS: Extra[] = [
     { id: 'extra-10', name: 'Extra 10', price: 0, type: 'checkbox' },
     { id: 'extra-11', name: 'Extra 11', price: 0, type: 'checkbox' },
     { id: 'extra-12', name: 'Extra 12', price: 0, type: 'checkbox' },
-    // ... adding enough to fill grid as per design
     { id: 'personas', name: 'Personas', price: 1000, type: 'counter' }, // Special case
 ];
+
+export interface Settings {
+    isChatEnabled: boolean;
+    heroTitle: string;
+    heroDescription: string;
+    heroImageUrl: string;
+    productSelectionTitle: string;
+    productSelectionDescription: string;
+    features: {
+        title: string;
+        description: string;
+        icon: string;
+    }[];
+}
