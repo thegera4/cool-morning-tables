@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { currentUser } from "@clerk/nextjs/server";
 import { getOrCreateCustomer } from "@/lib/actions/customer";
 import { calculateOrderTotal } from "@/lib/pricing";
+import { sanityFetch } from "@/sanity/lib/live";
 
 const stripe = process.env.STRIPE_SECRET_KEY as string
   ? new Stripe(process.env.STRIPE_SECRET_KEY as string, { apiVersion: "2024-12-18.acacia" as any })
@@ -21,30 +22,63 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { locationId, extras, payDeposit, metadata } = body;
+    const { locationId, extras, payDeposit, metadata, orderId } = body;
     const currency = "mxn";
-
-    // Server-side price calculation
-    let amount = 0;
-    try {
-      amount = await calculateOrderTotal(locationId, extras || {}, payDeposit);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : "Pricing Error";
-      return NextResponse.json({ error: message }, { status: 400 });
-    }
-
-    // Validating amount
-    if (!amount || amount <= 0) {
-      return NextResponse.json({ error: "Invalid calculated amount" }, { status: 400 });
-    }
-
     const email = user.emailAddresses[0]?.emailAddress;
     if (!email) {
       return NextResponse.json({ error: "Email required" }, { status: 400 });
     }
 
-    // Get or Create Customer
-    const { stripeCustomerId } = await getOrCreateCustomer(email, `${user.firstName} ${user.lastName}`, user.id);
+    // Server-side price calculation
+    let amount = 0;
+    let stripeCustomerId = "";
+
+    if (orderId) {
+      // Remaining payment flow: Fetch order to get pending amount
+      const order = await sanityFetch({
+        query: `*[_type == "order" && _id == $id][0]{
+          _id, amountPending, customer->{stripeCustomerId, email, name, _id}, status
+        }`,
+        params: { id: orderId }
+      }).then(res => res.data);
+
+      if (!order) {
+        return NextResponse.json({ error: "Order not found" }, { status: 404 });
+      }
+      if (order.status !== 'deposito') {
+        return NextResponse.json({ error: "Order is not in deposit status" }, { status: 400 });
+      }
+      amount = order.amountPending;
+
+      // Ensure we have a customer ID
+      if (order.customer?.stripeCustomerId) {
+        stripeCustomerId = order.customer.stripeCustomerId;
+      } else {
+        // Fallback: This shouldn't happen often if flow is correct, but safe to have
+        const custEmail = order.customer?.email || email;
+        const custName = order.customer?.name || `${user.firstName} ${user.lastName}`;
+        const { stripeCustomerId: newId } = await getOrCreateCustomer(custEmail, custName, user.id);
+        stripeCustomerId = newId;
+      }
+
+    } else {
+      // New Order Flow
+      try {
+        amount = await calculateOrderTotal(locationId, extras || {}, payDeposit);
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Pricing Error";
+        return NextResponse.json({ error: message }, { status: 400 });
+      }
+
+      // Validating amount
+      if (!amount || amount <= 0) {
+        return NextResponse.json({ error: "Invalid calculated amount" }, { status: 400 });
+      }
+
+      // Get or Create Customer
+      const { stripeCustomerId: createdId } = await getOrCreateCustomer(email, `${user.firstName} ${user.lastName}`, user.id);
+      stripeCustomerId = createdId;
+    }
 
     if (!stripeCustomerId) {
       console.error("Failed to get stripeCustomerId for user:", email);
@@ -56,6 +90,7 @@ export async function POST(req: NextRequest) {
     // Important: Stripe metadata values must be strings.
     const cleanMetadata: Record<string, string> = {
       clerkUserId: user.id,
+      ...(orderId ? { orderId, paymentType: 'remaining' } : { paymentType: 'new_order' })
     };
 
     if (metadata) {
