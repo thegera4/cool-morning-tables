@@ -2,6 +2,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { ReservationCard } from '@/components/reservas/ReservationCard';
 
+// Mock server actions to prevent 'defineLive' error from next-sanity
+vi.mock('@/lib/actions/order', () => ({
+  updateOrderPaid: vi.fn(),
+}));
+
 // Mock Lucide icons to avoid rendering issues in test environment
 vi.mock('lucide-react', () => ({
   Calendar: () => <span data-testid="icon-calendar" />,
@@ -33,7 +38,10 @@ vi.mock('@/sanity/lib/image', () => ({
   }),
 }));
 
-const mockPaidOrder = {
+const mockPaidOrder: any = {
+  _id: 'order-1',
+  _type: 'order',
+  createdAt: '2023-11-01T10:00:00Z',
   status: 'pagada',
   orderNumber: 'ORD-PAID-123',
   reservationDate: '2023-11-15',
@@ -45,7 +53,10 @@ const mockPaidOrder = {
   ],
 };
 
-const mockDepositOrder = {
+const mockDepositOrder: any = {
+  _id: 'order-2',
+  _type: 'order',
+  createdAt: '2023-11-02T10:00:00Z',
   status: 'deposito',
   orderNumber: 'ORD-DEPO-456',
   reservationDate: '2023-11-20',
@@ -91,6 +102,12 @@ describe('ReservationCard', () => {
     // Verify accent color class
     const orderNumber = screen.getByText('ORD-DEPO-456');
     expect(orderNumber.className).toContain('group-hover:text-brand-brown');
+
+    // Verify "Pagar Restante" component rendering
+    // We look for the button text which is rendered by RemainingPayment
+    // Mock data has amountPending: 1000
+    // Using RegExp for flexible currency matching
+    expect(screen.getByText(/Pagar Restante/)).toBeDefined();
   });
 
   it('toggles expansion on click', () => {
