@@ -9,9 +9,10 @@ import Image from "next/image";
 import { Calendar, Clock, ChevronDown, ChevronUp, ClipboardList, MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
+import { Order, Location } from "@/lib/data";
 
 interface ReservationCardProps {
-  order: any; // Type this properly if possible, or use the inferred type from params
+  order: Order;
   priority?: boolean;
 }
 
@@ -20,14 +21,14 @@ export function ReservationCard({ order, priority = false }: ReservationCardProp
   const statusConfig = getOrderStatus(order.status);
   // Find the main product item (not extras)
   // If multiple products or none found, fallback to first item
-  const mainItem = order.items?.find((item: any) => item.product?._type === 'product') || order.items?.[0];
-  const product = mainItem?.product;
+  const mainItem = order.items?.find((item) => (item.product as any)?._type === 'product') || order.items?.[0];
+  const product = mainItem?.product as Location | undefined;
 
   // Format dates
   // Manually parse YYYY-MM-DD to ensure it's treated as local time, not UTC
-  const [year, month, day] = order.reservationDate.split("-").map(Number);
+  const [year, month, day] = (order.reservationDate || "").split("-").map(Number);
   const reservationDate = new Date(year, month - 1, day);
-  const formattedDate = format(reservationDate, "EEEE, d 'de' MMMM", { locale: es });
+  const formattedDate = order.reservationDate ? format(reservationDate, "EEEE, d 'de' MMMM", { locale: es }) : "Fecha inválida";
   // Capitalize first letter
   const formattedDateCapitalized = formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1);
 
@@ -94,7 +95,7 @@ export function ReservationCard({ order, priority = false }: ReservationCardProp
 
           {isExpanded && (
             <div className="flex flex-col gap-1 mb-4 animate-in fade-in slide-in-from-top-1 duration-200">
-              {order.items?.map((item: any) => (
+              {order.items?.map((item) => (
                 <p key={item._key} className="text-zinc-500 text-sm pl-2 border-l-2 border-zinc-100 dark:border-zinc-800">
                   • {item.product?.name} - ({item.quantity})
                 </p>

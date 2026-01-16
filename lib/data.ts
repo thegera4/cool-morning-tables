@@ -5,6 +5,10 @@ export interface Location {
     description: string;
     imageUrl: string;
     blockedDates?: string[];
+    // Sanity specific fields
+    _type?: 'product';
+    images?: any[]; // Simplified for now, can be ImageAsset[]
+    slug?: { current: string };
 }
 
 export interface Extra {
@@ -12,6 +16,8 @@ export interface Extra {
     name: string;
     price: number | null; // null if it's "Included" or price varies/not shown in grid
     type: 'checkbox' | 'counter';
+    _type?: 'extra';
+    _id?: string;
 }
 
 export const LOCATIONS: Location[] = [
@@ -96,9 +102,44 @@ export interface Settings {
     heroImageUrl: string;
     productSelectionTitle: string;
     productSelectionDescription: string;
+
     features: {
         title: string;
         description: string;
         icon: string;
     }[];
+}
+
+export interface Customer {
+    _id: string;
+    _type: 'customer';
+    name?: string;
+    email?: string;
+    clerkId?: string;
+    phone?: string;
+}
+
+export interface OrderItem {
+    product: Location | Extra | { _id: string; name: string; _type: string }; // flexible for expanded refs
+    quantity: number;
+    priceAtPurchase: number;
+    _key?: string;
+}
+
+export interface Order {
+    _id: string;
+    _type: 'order';
+    orderNumber: string;
+    source?: 'web' | 'manual';
+    reservationDate?: string;
+    items: OrderItem[];
+    total: number;
+    amountPaid: number;
+    amountPending: number;
+    status: string;
+    customer?: Customer;
+    clerkUserId?: string;
+    email?: string;
+    stripePaymentId?: string;
+    createdAt: string;
 }

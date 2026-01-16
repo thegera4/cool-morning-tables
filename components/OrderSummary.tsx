@@ -108,7 +108,7 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
                         toast.error(`Error al crear la orden`);
                     }
                 }
-            } catch (e: any) {
+            } catch (e: unknown) {
                 console.error(e);
                 toast.error("Ocurrio un error inesperado.", {
                     className: "!bg-red-50 !text-red-600 !border-red-200",

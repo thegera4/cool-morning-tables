@@ -28,8 +28,9 @@ export async function POST(req: NextRequest) {
     let amount = 0;
     try {
       amount = await calculateOrderTotal(locationId, extras || {}, payDeposit);
-    } catch (err: any) {
-      return NextResponse.json({ error: err.message || "Pricing Error" }, { status: 400 });
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Pricing Error";
+      return NextResponse.json({ error: message }, { status: 400 });
     }
 
     // Validating amount
@@ -78,10 +79,11 @@ export async function POST(req: NextRequest) {
       clientSecret: paymentIntent.client_secret,
       paymentIntentId: paymentIntent.id
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Unknown Internal Error";
     console.error("Internal Error in create-payment-intent:", error);
     return NextResponse.json(
-      { error: `Internal Server Error: ${error.message}` },
+      { error: `Internal Server Error: ${message}` },
       { status: 500 }
     );
   }
