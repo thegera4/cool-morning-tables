@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import he from 'he';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -21,17 +22,37 @@ interface OrderEmailDetails {
   amountPending: number;
 }
 
+const escapeHtml = (value: string) => he.encode(value, { useNamedReferences: true });
+
 export async function sendOrderConfirmationEmail(to: string, details: OrderEmailDetails) {
   const { customerName, orderNumber, date, time, locationName, locationAddress, extras, total, amountPaid, amountPending } = details;
 
-  const extrasHtml = extras.map(extra => `
-    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #555;">
-      <span>• ${extra.name} - (${extra.quantity})</span>
-      <span>$${extra.price * extra.quantity}</span>
-    </div>
-  `).join('');
+  const safeCustomerName = escapeHtml(customerName);
+  const safeOrderNumber = orderNumber ? escapeHtml(orderNumber) : undefined;
+  const safeDate = escapeHtml(date);
+  const safeTime = time ? escapeHtml(time) : undefined;
+  const safeLocationName = escapeHtml(locationName);
 
-  const addressHtml = locationAddress.map(line => `<p style="margin: 0; color: #666;">${line}</p>`).join('');
+  const extrasHtml = extras.map(extra => {
+    const name = escapeHtml(extra.name);
+    const quantity = Number(extra.quantity) || 0;
+    const price = Number(extra.price) || 0;
+    const lineTotal = price * quantity;
+    return `
+    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #555;">
+      <span>• ${name} - (${quantity})</span>
+      <span>$${lineTotal}</span>
+    </div>
+  `;
+  }).join('');
+
+  const addressHtml = locationAddress
+    .map(line => `<p style="margin: 0; color: #666;">${escapeHtml(line)}</p>`)
+    .join('');
+
+  const safeTotal = Number(total) || 0;
+  const safeAmountPaid = Number(amountPaid) || 0;
+  const safeAmountPending = Number(amountPending) || 0;
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6; background-color: #ffffff;">
@@ -40,20 +61,20 @@ export async function sendOrderConfirmationEmail(to: string, details: OrderEmail
       </div>
 
       <div style="padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-        <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por tu compra, ${customerName}!</h2>
+        <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por tu compra, ${safeCustomerName}!</h2>
         <p>Tu reserva ha sido confirmada. Aquí están los detalles:</p>
 
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase;">Orden</h3>
-        <p style="margin: 5px 0; font-weight: bold;">${orderNumber || 'Pendiente (revisa tus reservas en nuestra web)'}</p>
+        <p style="margin: 5px 0; font-weight: bold;">${safeOrderNumber || 'Pendiente (revisa tus reservas en nuestra web)'}</p>
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase;">Fecha y Hora</h3>
-        <p style="margin: 5px 0; font-weight: bold;">${date}</p>
-        ${time ? `<p style="margin: 0; color: #666;">${time}</p>` : ''}
+        <p style="margin: 5px 0; font-weight: bold;">${safeDate}</p>
+        ${safeTime ? `<p style="margin: 0; color: #666;">${safeTime}</p>` : ''}
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase; margin-top: 20px;">Lugar</h3>
-        <p style="margin: 5px 0; font-weight: bold;">${locationName}</p>
+        <p style="margin: 5px 0; font-weight: bold;">${safeLocationName}</p>
         ${addressHtml}
 
         ${extras.length > 0 ? `
@@ -65,15 +86,15 @@ export async function sendOrderConfirmationEmail(to: string, details: OrderEmail
 
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
           <span style="font-weight: bold; font-size: 18px;">Total</span>
-          <span style="font-weight: bold; font-size: 18px;">$${total} MXN</span>
+          <span style="font-weight: bold; font-size: 18px;">$${safeTotal} MXN</span>
         </div>
         
         <div style="display: flex; justify-content: space-between; color: #666;">
           <span>Pagado</span>
-          <span>$${amountPaid} MXN</span>
+          <span>$${safeAmountPaid} MXN</span>
         </div>
         
-        ${amountPending > 0 ? `
+        ${safeAmountPending > 0 ? `
           <div style="background-color: #fffbeb; padding: 10px; border-radius: 4px; margin-top: 15px; border: 1px solid #fcd34d;">
             <p style="margin: 0; color: #92400e; font-size: 14px;"><strong>Pendiente: $${amountPending} MXN</strong></p>
             <p style="margin: 5px 0 0 0; color: #b45309; font-size: 12px;">El restante deberá liquidarse 2 días antes de la reserva.</p>
