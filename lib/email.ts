@@ -34,10 +34,16 @@ interface OrderEmailDetails {
 export async function sendOrderConfirmationEmail(to: string, details: OrderEmailDetails) {
   const { customerName, orderNumber, date, time, locationName, locationAddress, extras, total, amountPaid, amountPending } = details;
 
+  const safeCustomerName = escapeHtml(customerName);
+  const safeOrderNumber = orderNumber ? escapeHtml(orderNumber) : '';
+  const safeDate = escapeHtml(date);
+  const safeTime = time ? escapeHtml(time) : '';
+  const safeLocationName = escapeHtml(locationName);
+
   const extrasHtml = extras.map(extra => `
     <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #555;">
       <span>• ${escapeHtml(extra.name)} - (${extra.quantity})</span>
-      <span>$${extra.price * extra.quantity}</span>
+      <span>$${String(extra.price * extra.quantity)}</span>
     </div>
   `).join('');
 
@@ -75,17 +81,17 @@ export async function sendOrderConfirmationEmail(to: string, details: OrderEmail
 
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
           <span style="font-weight: bold; font-size: 18px;">Total</span>
-          <span style="font-weight: bold; font-size: 18px;">$${total} MXN</span>
+          <span style="font-weight: bold; font-size: 18px;">$${String(total)} MXN</span>
         </div>
         
         <div style="display: flex; justify-content: space-between; color: #666;">
           <span>Pagado</span>
-          <span>$${amountPaid} MXN</span>
+          <span>$${String(amountPaid)} MXN</span>
         </div>
         
         ${amountPending > 0 ? `
           <div style="background-color: #fffbeb; padding: 10px; border-radius: 4px; margin-top: 15px; border: 1px solid #fcd34d;">
-            <p style="margin: 0; color: #92400e; font-size: 14px;"><strong>Pendiente: $${amountPending} MXN</strong></p>
+            <p style="margin: 0; color: #92400e; font-size: 14px;"><strong>Pendiente: $${String(amountPending)} MXN</strong></p>
             <p style="margin: 5px 0 0 0; color: #b45309; font-size: 12px;">El restante deberá liquidarse 2 días antes de la reserva.</p>
           </div>
         ` : ''}
