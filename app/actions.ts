@@ -4,6 +4,7 @@ import { writeClient } from "@/sanity/lib/write-client";
 import { revalidatePath } from "next/cache";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { getOrCreateCustomer } from "@/lib/actions/customer";
+import { Extra } from "@/lib/data";
 
 /*
   * Book a product (location) for a specific date
@@ -120,7 +121,7 @@ export async function createOrder({ locationId, date, extras, contactInfo, payDe
 
     let total = product.price;
 
-    extrasDocs.forEach((extra: any) => {
+    extrasDocs.forEach((extra: Extra & { _id: string }) => {
       const quantity = extras[extra._id] || 0;
       if (quantity > 0) {
         // Determine if extra allows quantity or is single selection 
@@ -129,9 +130,9 @@ export async function createOrder({ locationId, date, extras, contactInfo, payDe
           _key: crypto.randomUUID(),
           product: { _type: "reference", _ref: extra._id },
           quantity: quantity,
-          priceAtPurchase: extra.price
+          priceAtPurchase: extra.price || 0
         });
-        total += extra.price * quantity;
+        total += (extra.price || 0) * quantity;
       }
     });
 

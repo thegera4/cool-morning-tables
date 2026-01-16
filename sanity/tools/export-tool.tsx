@@ -2,6 +2,7 @@ import { UserIcon, BasketIcon } from '@sanity/icons'
 import { Card, Flex, Button, Text, Stack } from '@sanity/ui'
 import { useClient } from 'sanity'
 import React, { useState } from 'react'
+import { Order, Customer } from '@/lib/data' // Assuming alias works in Studio, otherwise relative path
 
 export const ExportTool = () => {
   const client = useClient({ apiVersion: '2024-01-01' })
@@ -46,10 +47,15 @@ export const ExportTool = () => {
 
       // 1. Collect all unique item names
       const allItemNames = new Set<string>();
-      orders.forEach((order: any) => {
+      orders.forEach((order: Order) => {
         if (order.items) {
-          order.items.forEach((item: any) => {
-            if (item.name) allItemNames.add(item.name);
+          order.items.forEach((item) => {
+            // item from Sanity might differ slightly from strict OrderItem if expanded
+            // keying by product name implies item has 'name' which isn't on OrderItem directly (it's on product)
+            // The query maps: "name": product->name. So the FETCHED object has name.
+            // We need a local type for the fetched order specific to this query.
+            const itemName = (item as any).name;
+            if (itemName) allItemNames.add(itemName);
           });
         }
       });
@@ -60,7 +66,7 @@ export const ExportTool = () => {
       const headers = [...fixedHeaders, ...sortedItemNames];
 
       // 3. Create Data Rows
-      const rows = orders.map((order: any) => {
+      const rows = orders.map((order: any) => { // Keep any for custom query shape or define interface
         // Create a map of this order's items for quick lookup
         const orderItemsMap = new Map();
         if (order.items) {
@@ -122,12 +128,12 @@ export const ExportTool = () => {
       const customers = await client.fetch(query)
 
       const headers = ['Nombre', 'Email', 'Teléfono', 'Clerk ID', 'Stripe ID']
-      const rows = customers.map((c: any) => [
+      const rows = customers.map((c: Customer & { stripeCustomerId?: string }) => [
         c.name,
         c.email,
         c.phone,
-        c.clerkUserId,
-        c.stripeCustomerId
+        c.clerkId, // Interface calls it clerkId, query calls it clerkUserId... naming mismatch.
+        c.stripeCustomerId || (c as any).stripeCustomerId
       ])
 
       const csvContent = [

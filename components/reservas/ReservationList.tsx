@@ -4,8 +4,10 @@ import { useState } from "react";
 import { ReservationCard } from "./ReservationCard";
 import { isAfter, isBefore, startOfDay } from "date-fns";
 
+import { Order } from "@/lib/data";
+
 interface ReservationListProps {
-  orders: any[];
+  orders: Order[];
 }
 
 type Tab = "upcoming" | "history";
@@ -16,7 +18,8 @@ export function ReservationList({ orders }: ReservationListProps) {
   const today = startOfDay(new Date());
 
   // Split orders into upcoming and history
-  const upcomingOrders = orders.filter((order) => {
+  const upcomingOrders = orders.filter((order): order is Order & { reservationDate: string } => {
+    if (!order.reservationDate) return false;
     // Manually parse YYYY-MM-DD to ensure it's treated as local time
     const [year, month, day] = order.reservationDate.split("-").map(Number);
     const orderDate = new Date(year, month - 1, day);
@@ -31,7 +34,8 @@ export function ReservationList({ orders }: ReservationListProps) {
     return dateA.getTime() - dateB.getTime();
   });
 
-  const historyOrders = orders.filter((order) => {
+  const historyOrders = orders.filter((order): order is Order & { reservationDate: string } => {
+    if (!order.reservationDate) return false;
     // Manually parse YYYY-MM-DD to ensure it's treated as local time
     const [year, month, day] = order.reservationDate.split("-").map(Number);
     const orderDate = new Date(year, month - 1, day);

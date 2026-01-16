@@ -14,7 +14,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 
 interface CreateOrderParams {
   paymentIntentId: string;
-  items: any[]; // refine type as needed
+  items: { _id: string; quantity: number; price: number; name?: string }[];
   totalAmount: number;
   customerName?: string;
   reservationDate: string;
@@ -44,7 +44,7 @@ export async function createOrder({ paymentIntentId, items, totalAmount, custome
     const { sanityCustomerId, stripeCustomerId } = await getOrCreateCustomer(email, customerName || `${user.firstName} ${user.lastName}`, user.id, customerPhone);
 
     // 2.5 Resolve Product IDs (Handle slugs vs IDs)
-    const resolvedItems = await Promise.all(items.map(async (item: any) => {
+    const resolvedItems = await Promise.all(items.map(async (item) => {
       // Try to find product by ID or Slug (check both 'product' and 'extra' types)
       const query = `*[(_type == "product" || _type == "extra") && (_id == $id || slug.current == $id)][0]{_id, _type}`;
       const resolved = await client.fetch(query, { id: item._id });
@@ -74,7 +74,7 @@ export async function createOrder({ paymentIntentId, items, totalAmount, custome
       _type: "order",
       orderNumber: orderNumberVal,
       reservationDate: reservationDate, // Use passed date
-      items: resolvedItems.map((item: any) => ({
+      items: resolvedItems.map((item) => ({
         _type: "object",
         _key: item._resolved._id, // Use resolved ID for key
         product: { _type: "reference", _ref: item._resolved._id },
@@ -101,7 +101,7 @@ export async function createOrder({ paymentIntentId, items, totalAmount, custome
     });
 
     // 4. Update Product Blocked Dates
-    await Promise.all(resolvedItems.map(async (item: any) => {
+    await Promise.all(resolvedItems.map(async (item) => {
       if (item._resolved._type === 'product') {
         await writeClient
           .patch(item._resolved._id)
@@ -120,7 +120,7 @@ export async function createOrder({ paymentIntentId, items, totalAmount, custome
       time: time,
       locationName: locationName,
       locationAddress: locationAddress,
-      extras: items.filter((item: any) => item._id !== locationName && item.name !== locationName).map((item: any) => ({
+      extras: items.filter((item) => item._id !== locationName && item.name !== locationName).map((item) => ({
         name: item.name || "Extra",
         quantity: item.quantity || 1,
         price: item.price || 0

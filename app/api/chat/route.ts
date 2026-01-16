@@ -8,6 +8,16 @@ import { ORDERS_QUERY } from "@/sanity/queries/orders";
 import { PRODUCTS_QUERY } from "@/sanity/queries/products";
 import { ALL_EXTRAS_QUERY } from "@/sanity/queries/extras";
 
+// Helper interfaces
+interface ToolFunction {
+  parameters?: { type?: string;[key: string]: any };
+}
+interface ToolItem {
+  function?: ToolFunction;
+  [key: string]: any;
+}
+
+
 // Create DeepSeek provider using OpenAI compatibility
 const deepseek = createOpenAI({
   apiKey: process.env.DEEPSEEK_API_KEY,
@@ -17,7 +27,7 @@ const deepseek = createOpenAI({
       try {
         const body = JSON.parse(options.body as string);
         if (body.tools) {
-          body.tools = body.tools.map((t: any) => {
+          body.tools = body.tools.map((t: ToolItem) => {
             if (t.function?.parameters && !t.function.parameters.type) {
               t.function.parameters.type = "object";
             }
@@ -149,20 +159,9 @@ export async function POST(req: Request) {
   return response;
 }
 
-/**
-  * Helper function to convert Next.js messages to OpenAI core messages
-  * @param messages - Array of messages from Next.js
-  * @returns Array of messages in OpenAI core message format
-*/
-function convertToCoreMessages(messages: any[]) {
+function convertToCoreMessages(messages: any[]): any[] {
   return messages.map((m) => ({
     role: m.role,
-    content:
-      m.content ||
-      m.parts
-        ?.filter((p: any) => p.type === "text")
-        .map((p: any) => p.text)
-        .join("") ||
-      "",
+    content: m.content
   }));
 }
