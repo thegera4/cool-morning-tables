@@ -8,6 +8,16 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+function escapeHtml(text: string | undefined | null): string {
+  if (!text) return '';
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 interface OrderEmailDetails {
   customerName: string;
   orderNumber?: string;
@@ -26,12 +36,12 @@ export async function sendOrderConfirmationEmail(to: string, details: OrderEmail
 
   const extrasHtml = extras.map(extra => `
     <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #555;">
-      <span>• ${extra.name} - (${extra.quantity})</span>
+      <span>• ${escapeHtml(extra.name)} - (${extra.quantity})</span>
       <span>$${extra.price * extra.quantity}</span>
     </div>
   `).join('');
 
-  const addressHtml = locationAddress.map(line => `<p style="margin: 0; color: #666;">${line}</p>`).join('');
+  const addressHtml = locationAddress.map(line => `<p style="margin: 0; color: #666;">${escapeHtml(line)}</p>`).join('');
 
   const html = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6; background-color: #ffffff;">
@@ -40,20 +50,20 @@ export async function sendOrderConfirmationEmail(to: string, details: OrderEmail
       </div>
 
       <div style="padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-        <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por tu compra, ${customerName}!</h2>
+        <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por tu compra, ${escapeHtml(customerName)}!</h2>
         <p>Tu reserva ha sido confirmada. Aquí están los detalles:</p>
 
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase;">Orden</h3>
-        <p style="margin: 5px 0; font-weight: bold;">${orderNumber || 'Pendiente (revisa tus reservas en nuestra web)'}</p>
+        <p style="margin: 5px 0; font-weight: bold;">${escapeHtml(orderNumber) || 'Pendiente (revisa tus reservas en nuestra web)'}</p>
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase;">Fecha y Hora</h3>
-        <p style="margin: 5px 0; font-weight: bold;">${date}</p>
-        ${time ? `<p style="margin: 0; color: #666;">${time}</p>` : ''}
+        <p style="margin: 5px 0; font-weight: bold;">${escapeHtml(date)}</p>
+        ${time ? `<p style="margin: 0; color: #666;">${escapeHtml(time)}</p>` : ''}
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase; margin-top: 20px;">Lugar</h3>
-        <p style="margin: 5px 0; font-weight: bold;">${locationName}</p>
+        <p style="margin: 5px 0; font-weight: bold;">${escapeHtml(locationName)}</p>
         ${addressHtml}
 
         ${extras.length > 0 ? `
@@ -110,7 +120,7 @@ export async function sendOrderConfirmationEmail(to: string, details: OrderEmail
   await transporter.sendMail({
     from: '"Cool Morning" <' + process.env.EMAIL_USER + '>',
     to,
-    subject: `Confirmación de Reserva - ${date}`,
+    subject: `Confirmación de Reserva 🎊 - ${escapeHtml(date)}`,
     html,
   });
 };
@@ -134,15 +144,15 @@ export async function sendRemainingPaymentEmail(to: string, details: RemainingPa
       </div>
 
       <div style="padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-        <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por tu pago, ${customerName}!</h2>
+        <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por completar tu pago, ${escapeHtml(customerName)}!</h2>
         <p>Hemos recibido el pago restante de tu reservación. ¡Todo está listo!</p>
 
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase;">Detalles de la Orden</h3>
-        <p style="margin: 5px 0;"><strong>Orden:</strong> ${orderNumber}</p>
-        <p style="margin: 5px 0;"><strong>Lugar:</strong> ${locationName}</p>
-        <p style="margin: 5px 0;"><strong>Fecha:</strong> ${date}</p>
+        <p style="margin: 5px 0;"><strong>Orden:</strong> ${escapeHtml(orderNumber)}</p>
+        <p style="margin: 5px 0;"><strong>Lugar:</strong> ${escapeHtml(locationName)}</p>
+        <p style="margin: 5px 0;"><strong>Fecha:</strong> ${escapeHtml(date)}</p>
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase; margin-top: 20px;">Resumen de Pago</h3>
         <div style="background-color: #f0fdf4; padding: 15px; border-radius: 4px; border: 1px solid #bbf7d0;">
@@ -173,14 +183,14 @@ export async function sendRemainingPaymentEmail(to: string, details: RemainingPa
           </div>
 
           <a href="https://coolmorning.com.mx/" style="color: rgba(255,255,255,0.9); text-decoration: none; font-size: 12px; letter-spacing: 1px; font-weight: bold;">COOLMORNING.COM.MX</a>
-      </div>
+       </div>
     </div>
   `;
 
   await transporter.sendMail({
     from: '"Cool Morning" <' + process.env.EMAIL_USER + '>',
     to,
-    subject: `Pago Completado🎉 - Orden ${orderNumber}`,
+    subject: `Pago Completo! 🎉 - ${escapeHtml(orderNumber)}`,
     html,
   });
 }
