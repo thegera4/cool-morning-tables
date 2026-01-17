@@ -103,7 +103,7 @@ function CheckoutButton({ isValid, isPending, startTransition, locationId, locat
                             style: { color: 'green' },
                             duration: 10000,
                         });
-                        setTimeout(() => { window.location.reload(); }, 10000);
+                        setTimeout(() => { window.location.href = "/"; }, 10000);
                     } else {
                         toast.error(`Error al crear la orden`);
                     }
