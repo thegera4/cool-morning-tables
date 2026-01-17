@@ -12,17 +12,19 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   projects: [
-    {
-      name: 'setup',
-      testMatch: /.*\.setup\.ts/,
-    },
+    ...(process.env.CI ? [] : [
+      {
+        name: 'setup',
+        testMatch: /.*\.setup\.ts/,
+      },
+    ]),
     {
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json',
+        storageState: process.env.CI ? undefined : 'playwright/.auth/user.json',
       },
-      dependencies: ['setup'],
+      dependencies: process.env.CI ? [] : ['setup'],
     },
   ],
   webServer: {
