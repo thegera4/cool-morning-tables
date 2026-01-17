@@ -22,19 +22,19 @@ interface OrderEmailDetails {
   amountPending: number;
 }
 
-const escapeHtml = (value: string | null | undefined) => DOMPurify.sanitize(value || '');
+
 
 export async function sendOrderConfirmationEmail(to: string, details: OrderEmailDetails) {
   const { customerName, orderNumber, date, time, locationName, locationAddress, extras, total, amountPaid, amountPending } = details;
 
-  const safeCustomerName = escapeHtml(customerName);
-  const safeOrderNumber = orderNumber ? escapeHtml(orderNumber) : undefined;
-  const safeDate = escapeHtml(date);
-  const safeTime = time ? escapeHtml(time) : undefined;
-  const safeLocationName = escapeHtml(locationName);
+  const safeCustomerName = DOMPurify.sanitize(customerName || '');
+  const safeOrderNumber = orderNumber ? DOMPurify.sanitize(orderNumber || '') : undefined;
+  const safeDate = DOMPurify.sanitize(date || '');
+  const safeTime = time ? DOMPurify.sanitize(time || '') : undefined;
+  const safeLocationName = DOMPurify.sanitize(locationName || '');
 
   const extrasHtml = extras.map(extra => {
-    const name = escapeHtml(extra.name);
+    const name = DOMPurify.sanitize(extra.name || '');
     const quantity = Number(extra.quantity) || 0;
     const price = Number(extra.price) || 0;
     const lineTotal = price * quantity;
@@ -47,7 +47,7 @@ export async function sendOrderConfirmationEmail(to: string, details: OrderEmail
   }).join('');
 
   const addressHtml = locationAddress
-    .map(line => `<p style="margin: 0; color: #666;">${escapeHtml(line)}</p>`)
+    .map(line => `<p style="margin: 0; color: #666;">${DOMPurify.sanitize(line || '')}</p>`)
     .join('');
 
   const safeTotal = Number(total) || 0;
@@ -131,7 +131,7 @@ export async function sendOrderConfirmationEmail(to: string, details: OrderEmail
   await transporter.sendMail({
     from: '"Cool Morning" <' + process.env.EMAIL_USER + '>',
     to,
-    subject: `Confirmación de Reserva 🎊 - ${escapeHtml(date)}`,
+    subject: `Confirmación de Reserva 🎊 - ${DOMPurify.sanitize(date || '')}`,
     html,
   });
 };
@@ -155,15 +155,15 @@ export async function sendRemainingPaymentEmail(to: string, details: RemainingPa
       </div>
 
       <div style="padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-        <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por completar tu pago, ${escapeHtml(customerName)}!</h2>
+        <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por completar tu pago, ${DOMPurify.sanitize(customerName || '')}!</h2>
         <p>Hemos recibido el pago restante de tu reservación. ¡Todo está listo!</p>
 
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase;">Detalles de la Orden</h3>
-        <p style="margin: 5px 0;"><strong>Orden:</strong> ${escapeHtml(orderNumber)}</p>
-        <p style="margin: 5px 0;"><strong>Lugar:</strong> ${escapeHtml(locationName)}</p>
-        <p style="margin: 5px 0;"><strong>Fecha:</strong> ${escapeHtml(date)}</p>
+        <p style="margin: 5px 0;"><strong>Orden:</strong> ${DOMPurify.sanitize(orderNumber || '')}</p>
+        <p style="margin: 5px 0;"><strong>Lugar:</strong> ${DOMPurify.sanitize(locationName || '')}</p>
+        <p style="margin: 5px 0;"><strong>Fecha:</strong> ${DOMPurify.sanitize(date || '')}</p>
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase; margin-top: 20px;">Resumen de Pago</h3>
         <div style="background-color: #f0fdf4; padding: 15px; border-radius: 4px; border: 1px solid #bbf7d0;">
@@ -201,7 +201,7 @@ export async function sendRemainingPaymentEmail(to: string, details: RemainingPa
   await transporter.sendMail({
     from: '"Cool Morning" <' + process.env.EMAIL_USER + '>',
     to,
-    subject: `Pago Completo! 🎉 - ${escapeHtml(orderNumber)}`,
+    subject: `Pago Completo! 🎉 - ${DOMPurify.sanitize(orderNumber || '')}`,
     html,
   });
 }
