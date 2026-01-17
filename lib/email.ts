@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import DOMPurify from 'isomorphic-dompurify';
+import Handlebars from 'handlebars';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -22,84 +22,59 @@ interface OrderEmailDetails {
   amountPending: number;
 }
 
-
-
-export async function sendOrderConfirmationEmail(to: string, details: OrderEmailDetails) {
-  const { customerName, orderNumber, date, time, locationName, locationAddress, extras, total, amountPaid, amountPending } = details;
-
-  const safeCustomerName = DOMPurify.sanitize(customerName || '');
-  const safeOrderNumber = orderNumber ? DOMPurify.sanitize(orderNumber || '') : undefined;
-  const safeDate = DOMPurify.sanitize(date || '');
-  const safeTime = time ? DOMPurify.sanitize(time || '') : undefined;
-  const safeLocationName = DOMPurify.sanitize(locationName || '');
-
-  const extrasHtml = extras.map(extra => {
-    const name = DOMPurify.sanitize(extra.name || '');
-    const quantity = Number(extra.quantity) || 0;
-    const price = Number(extra.price) || 0;
-    const lineTotal = price * quantity;
-    return `
-    <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #555;">
-      <span>• ${name} - (${quantity})</span>
-      <span>$${lineTotal}</span>
-    </div>
-  `;
-  }).join('');
-
-  const addressHtml = locationAddress
-    .map(line => `<p style="margin: 0; color: #666;">${DOMPurify.sanitize(line || '')}</p>`)
-    .join('');
-
-  const safeTotal = Number(total) || 0;
-  const safeAmountPaid = Number(amountPaid) || 0;
-  const safeAmountPending = Number(amountPending) || 0;
-
-  const html = `
+const ORDER_CONFIRMATION_TEMPLATE = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6; background-color: #ffffff;">
       <div style="text-align: center; padding: 20px 0;">
         <img src="https://coolmorning.com.mx/wp-content/uploads/2024/10/cropped-logotipo-cool-120x56.png" alt="Cool Morning" style="height: 50px; object-fit: contain;">
       </div>
 
       <div style="padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-        <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por tu compra, ${safeCustomerName}!</h2>
+        <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por tu compra, {{customerName}}!</h2>
         <p>Tu reserva ha sido confirmada. Aquí están los detalles:</p>
 
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase;">Orden</h3>
-        <p style="margin: 5px 0; font-weight: bold;">${safeOrderNumber || 'Pendiente (revisa tus reservas en nuestra web)'}</p>
+        <p style="margin: 5px 0; font-weight: bold;">{{#if orderNumber}}{{orderNumber}}{{else}}Pendiente (revisa tus reservas en nuestra web){{/if}}</p>
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase;">Fecha y Hora</h3>
-        <p style="margin: 5px 0; font-weight: bold;">${safeDate}</p>
-        ${safeTime ? `<p style="margin: 0; color: #666;">${safeTime}</p>` : ''}
+        <p style="margin: 5px 0; font-weight: bold;">{{date}}</p>
+        {{#if time}}<p style="margin: 0; color: #666;">{{time}}</p>{{/if}}
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase; margin-top: 20px;">Lugar</h3>
-        <p style="margin: 5px 0; font-weight: bold;">${safeLocationName}</p>
-        ${addressHtml}
+        <p style="margin: 5px 0; font-weight: bold;">{{locationName}}</p>
+        {{#each locationAddress}}
+        <p style="margin: 0; color: #666;">{{this}}</p>
+        {{/each}}
 
-        ${extras.length > 0 ? `
+        {{#if hasExtras}}
           <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase; margin-top: 20px;">Extras</h3>
-          ${extrasHtml}
-        ` : ''}
+          {{#each extras}}
+          <div style="display: flex; justify-content: space-between; margin-bottom: 5px; color: #555;">
+            <span>• {{name}} - ({{quantity}})</span>
+            <span>$\{{lineTotal}}</span>
+          </div>
+          {{/each}}
+        {{/if}}
 
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
 
         <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
           <span style="font-weight: bold; font-size: 18px;">Total</span>
-          <span style="font-weight: bold; font-size: 18px;">$${safeTotal} MXN</span>
+          <span style="font-weight: bold; font-size: 18px;">$\{{total}} MXN</span>
         </div>
         
         <div style="display: flex; justify-content: space-between; color: #666;">
           <span>Pagado</span>
-          <span>$${safeAmountPaid} MXN</span>
+          <span>$\{{amountPaid}} MXN</span>
         </div>
         
-        ${safeAmountPending > 0 ? `
+        {{#if hasPending}}
           <div style="background-color: #fffbeb; padding: 10px; border-radius: 4px; margin-top: 15px; border: 1px solid #fcd34d;">
-            <p style="margin: 0; color: #92400e; font-size: 14px;"><strong>Pendiente: $${String(amountPending)} MXN</strong></p>
+            <p style="margin: 0; color: #92400e; font-size: 14px;"><strong>Pendiente: $\{{amountPending}} MXN</strong></p>
             <p style="margin: 5px 0 0 0; color: #b45309; font-size: 12px;">El restante deberá liquidarse 2 días antes de la reserva.</p>
           </div>
-        ` : ''}
+        {{/if}}
 
       </div>
 
@@ -126,12 +101,38 @@ export async function sendOrderConfirmationEmail(to: string, details: OrderEmail
           <p style="margin-top: 15px; font-size: 10px; color: rgba(255,255,255,0.6);">© Copyright Cool Morning.</p>
       </div>
     </div>
-  `;
+`;
+
+export async function sendOrderConfirmationEmail(to: string, details: OrderEmailDetails) {
+  const { customerName, orderNumber, date, time, locationName, locationAddress, extras, total, amountPaid, amountPending } = details;
+
+  // Pre-process data for Handlebars
+  const templateData = {
+    customerName,
+    orderNumber,
+    date,
+    time,
+    locationName,
+    locationAddress,
+    hasExtras: extras.length > 0,
+    extras: extras.map(extra => ({
+      name: extra.name,
+      quantity: Number(extra.quantity) || 0,
+      lineTotal: (Number(extra.price) || 0) * (Number(extra.quantity) || 0)
+    })),
+    total: Number(total) || 0,
+    amountPaid: Number(amountPaid) || 0,
+    amountPending: Number(amountPending) || 0,
+    hasPending: (Number(amountPending) || 0) > 0
+  };
+
+  const template = Handlebars.compile(ORDER_CONFIRMATION_TEMPLATE);
+  const html = template(templateData);
 
   await transporter.sendMail({
     from: '"Cool Morning" <' + process.env.EMAIL_USER + '>',
     to,
-    subject: `Confirmación de Reserva 🎊 - ${DOMPurify.sanitize(date || '')}`,
+    subject: `Confirmación de Reserva 🎊 - ${date}`,
     html,
   });
 };
@@ -145,30 +146,27 @@ interface RemainingPaymentEmailDetails {
   locationName: string;
 };
 
-export async function sendRemainingPaymentEmail(to: string, details: RemainingPaymentEmailDetails) {
-  const { customerName, orderNumber, amountPaidNow, totalPaid, date, locationName } = details;
-
-  const html = `
+const PAYMENT_CONFIRMATION_TEMPLATE = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6; background-color: #ffffff;">
       <div style="text-align: center; padding: 20px 0;">
         <img src="https://coolmorning.com.mx/wp-content/uploads/2024/10/cropped-logotipo-cool-120x56.png" alt="Cool Morning" style="height: 50px; object-fit: contain;">
       </div>
 
       <div style="padding: 20px; border-radius: 8px; border: 1px solid #e5e7eb;">
-        <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por completar tu pago, ${DOMPurify.sanitize(customerName || '')}!</h2>
+        <h2 style="color: #04A595; font-size: 18px; margin-top: 0;">¡Gracias por completar tu pago, {{customerName}}!</h2>
         <p>Hemos recibido el pago restante de tu reservación. ¡Todo está listo!</p>
 
         <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 20px 0;" />
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase;">Detalles de la Orden</h3>
-        <p style="margin: 5px 0;"><strong>Orden:</strong> ${DOMPurify.sanitize(orderNumber || '')}</p>
-        <p style="margin: 5px 0;"><strong>Lugar:</strong> ${DOMPurify.sanitize(locationName || '')}</p>
-        <p style="margin: 5px 0;"><strong>Fecha:</strong> ${DOMPurify.sanitize(date || '')}</p>
+        <p style="margin: 5px 0;"><strong>Orden:</strong> {{orderNumber}}</p>
+        <p style="margin: 5px 0;"><strong>Lugar:</strong> {{locationName}}</p>
+        <p style="margin: 5px 0;"><strong>Fecha:</strong> {{date}}</p>
 
         <h3 style="color: #04A595; font-size: 14px; text-transform: uppercase; margin-top: 20px;">Resumen de Pago</h3>
         <div style="background-color: #f0fdf4; padding: 15px; border-radius: 4px; border: 1px solid #bbf7d0;">
-            <p style="margin: 0; color: #166534;"><strong>Pago Recibido: $${amountPaidNow} MXN</strong></p>
-            <p style="margin: 5px 0 0 0; color: #15803d;">Total Pagado: $${totalPaid} MXN</p>
+            <p style="margin: 0; color: #166534;"><strong>Pago Recibido: $\{{amountPaidNow}} MXN</strong></p>
+            <p style="margin: 5px 0 0 0; color: #15803d;">Total Pagado: $\{{totalPaid}} MXN</p>
         </div>
 
         <div style="margin-top: 30px; text-align: center;">
@@ -196,12 +194,16 @@ export async function sendRemainingPaymentEmail(to: string, details: RemainingPa
           <a href="https://coolmorning.com.mx/" style="color: rgba(255,255,255,0.9); text-decoration: none; font-size: 12px; letter-spacing: 1px; font-weight: bold;">COOLMORNING.COM.MX</a>
        </div>
     </div>
-  `;
+`;
+
+export async function sendRemainingPaymentEmail(to: string, details: RemainingPaymentEmailDetails) {
+  const template = Handlebars.compile(PAYMENT_CONFIRMATION_TEMPLATE);
+  const html = template(details);
 
   await transporter.sendMail({
     from: '"Cool Morning" <' + process.env.EMAIL_USER + '>',
     to,
-    subject: `Pago Completo! 🎉 - ${DOMPurify.sanitize(orderNumber || '')}`,
+    subject: `Pago Completo! 🎉 - ${details.orderNumber}`,
     html,
   });
 }
