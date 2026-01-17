@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import escapeHtml from 'escape-html';
+import xss from 'xss';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -21,6 +21,8 @@ interface OrderEmailDetails {
   amountPaid: number;
   amountPending: number;
 }
+
+const escapeHtml = (value: string | null | undefined) => xss(value || '');
 
 export async function sendOrderConfirmationEmail(to: string, details: OrderEmailDetails) {
   const { customerName, orderNumber, date, time, locationName, locationAddress, extras, total, amountPaid, amountPending } = details;
