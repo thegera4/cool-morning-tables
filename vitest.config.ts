@@ -12,6 +12,11 @@ export default defineConfig({
     coverage: {
       exclude: ['sanity/**', '**/*.config.*', 'tests/**', 'components/ui/**'],
     },
+    env: {
+      NEXT_PUBLIC_SANITY_DATASET: 'test-dataset',
+      NEXT_PUBLIC_SANITY_PROJECT_ID: 'test-project-id',
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: 'pk_test_123',
+    },
   },
   resolve: {
     alias: {

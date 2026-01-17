@@ -10,9 +10,11 @@ import { useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
+import { usePathname } from "next/navigation";
 
 export function Chat() {
   const { user } = useUser();
+  const pathname = usePathname();
   const [messages, setMessages] = useState<any[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -82,7 +84,10 @@ export function Chat() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button className="text-white hover:text-brand-teal transition-colors hover:cursor-pointer">
+        <button className={cn(
+          "transition-colors hover:cursor-pointer hover:text-brand-teal",
+          pathname === "/reservas" ? "text-brand-teal" : "text-white"
+        )}>
           <span className="sr-only">Chat AI</span>
           <Bot className="h-6 w-6" />
         </button>

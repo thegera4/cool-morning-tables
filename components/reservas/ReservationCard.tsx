@@ -10,6 +10,7 @@ import { Calendar, Clock, ChevronDown, ChevronUp, ClipboardList, MapPin } from "
 import { Card, CardContent } from "@/components/ui/card";
 import { formatCurrency } from "@/lib/utils";
 import { Order, Location } from "@/lib/data";
+import { RemainingPayment } from "./RemainingPayment";
 
 interface ReservationCardProps {
   order: Order;
@@ -123,21 +124,26 @@ export function ReservationCard({ order, priority = false }: ReservationCardProp
             </div>
           </div>
 
+
           <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800">
             {order.status === 'deposito' ? (
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between text-zinc-500">
-                  <span>Total reservación:</span>
-                  <span>{formatCurrency(order.total)}</span>
+              <div className="space-y-4">
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between text-zinc-500">
+                    <span>Total reservación:</span>
+                    <span>{formatCurrency(order.total)}</span>
+                  </div>
+                  <div className="flex justify-between text-zinc-500">
+                    <span>Pagado:</span>
+                    <span>{formatCurrency(order.amountPaid)}</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-brand-brown">
+                    <span>Pendiente:</span>
+                    <span>{formatCurrency(order.amountPending)}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-zinc-500">
-                  <span>Pagado:</span>
-                  <span>{formatCurrency(order.amountPaid)}</span>
-                </div>
-                <div className="flex justify-between font-bold text-brand-brown">
-                  <span>Pendiente:</span>
-                  <span>{formatCurrency(order.amountPending)}</span>
-                </div>
+
+                <RemainingPayment orderId={order._id} amount={order.amountPending} />
               </div>
             ) : (
               <div className="flex justify-between font-bold text-zinc-900 dark:text-zinc-100">
@@ -146,6 +152,7 @@ export function ReservationCard({ order, priority = false }: ReservationCardProp
               </div>
             )}
           </div>
+
         </div>
 
         {/* Image Section */}

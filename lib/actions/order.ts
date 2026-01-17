@@ -6,7 +6,8 @@ import Stripe from "stripe";
 import { getOrCreateCustomer } from "./customer";
 import { randomUUID } from "crypto";
 import { client } from "@/sanity/lib/client";
-import { sendOrderConfirmationEmail } from "@/lib/email";
+import { sanityFetch } from "@/sanity/lib/live";
+import { sendOrderConfirmationEmail, sendRemainingPaymentEmail } from "@/lib/email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   apiVersion: "2025-12-15.clover" as any,
@@ -133,6 +134,89 @@ export async function createOrder({ paymentIntentId, items, totalAmount, custome
     return { success: true, orderId: order._id };
   } catch (error: any) {
     console.error("Error creating order:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function updateOrderPaid(orderId: string, paymentIntentId: string, amount: number) {
+  try {
+    const user = await currentUser();
+    if (!user) throw new Error("Unauthorized");
+
+    // Verify Stripe Payment
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+    if (paymentIntent.status !== 'succeeded') {
+      throw new Error("Payment not succeeded");
+    }
+
+    // Fetch Full Order Details (with expanded references)
+    const order = await sanityFetch({
+      query: `*[_type == "order" && _id == $id][0]{
+        ...,
+        customer->,
+        items[]{
+          ...,
+          product->
+        }
+      }`,
+      params: { id: orderId }
+    }).then(res => res.data);
+
+    if (!order) throw new Error("Order not found");
+
+    // Calculate new amounts
+    const amountPaid = (order.amountPaid || 0) + amount;
+    const amountPending = 0; // Fully paid
+
+    // Update Order
+    await writeClient.patch(orderId)
+      .set({
+        status: 'pagada',
+        amountPending: amountPending,
+        amountPaid: amountPaid,
+      })
+      .commit();
+
+    // Prepare Email Details
+    // Find main location product
+    const locationItem = order.items?.find((item: any) => item.product?._type === 'product');
+    const locationName = locationItem?.product?.name || "Ubicación desconocida";
+
+    // Address Logic (mirrored from frontend)
+    const isAlberca = locationName.toLowerCase().trim() === "alberca privada";
+    const locationAddress = isAlberca ? [
+      "Andrés Villarreal 191",
+      "Col. División del Norte",
+      "Torreón, Coahuila"
+    ] : [
+      "La Trattoria TRC",
+      "Allende 138 Pte.",
+      "Torreon, Coahuila"
+    ];
+
+    const extras = order.items
+      ?.filter((item: any) => item._key !== locationItem?._key && item.product?._type === 'extra') // Exclude main location
+      .map((item: any) => ({
+        name: item.product?.name || "Extra",
+        quantity: item.quantity || 1,
+        price: item.priceAtPurchase || 0
+      })) || [];
+
+    // Send Email
+    if (order.customer?.email) {
+      await sendRemainingPaymentEmail(order.customer.email, {
+        customerName: order.customer.name || "Cliente",
+        orderNumber: order.orderNumber,
+        date: order.reservationDate,
+        amountPaidNow: amount,
+        totalPaid: amountPaid,
+        locationName,
+      });
+    }
+
+    return { success: true };
+  } catch (error: any) {
+    console.error("Error updating order:", error);
     return { success: false, error: error.message };
   }
 }
