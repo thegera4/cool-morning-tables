@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import he from 'he';
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -22,7 +21,15 @@ interface OrderEmailDetails {
   amountPending: number;
 }
 
-const escapeHtml = (value: string) => he.encode(value, { useNamedReferences: true });
+const escapeHtml = (text: string | null | undefined): string => {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
 
 export async function sendOrderConfirmationEmail(to: string, details: OrderEmailDetails) {
   const { customerName, orderNumber, date, time, locationName, locationAddress, extras, total, amountPaid, amountPending } = details;
