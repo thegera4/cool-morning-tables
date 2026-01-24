@@ -67,6 +67,8 @@ export function BookingCalendar({ date, setDate, blockedDates }: BookingCalendar
             }}
             disabled={(date) => date < startDate || date > maxDate || blockedDates.some(blocked => isSameDay(date, blocked))}
             hidden={{ before: startDate, after: maxDate }}
+            startMonth={startDate}
+            endMonth={maxDate}
             autoFocus
             locale={es}
             components={{
