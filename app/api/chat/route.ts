@@ -76,6 +76,30 @@ export async function POST(req: Request) {
     
     Cool Morning esta localizado en Torreón, Coahuila, México.
     
+    **INFORMACIÓN DEL CATÁLOGO "CENA COLUMPIOS 2026" (REGLAS Y DETALLES):**
+    Usa esta información para responder preguntas sobre reglas, clima, menús y extras:
+    ---
+    UBICACIÓN: Allende #138 Poniente, Torreón Coahuila (Restaurante Trattoria en Casa Allende). EXCEPCIÓN: "Columpios en Alberca" es en Andrés Villarreal 191.
+    
+    INCLUYE (Cena $1,990):
+    - Cena tres tiempos: 1 Pizza (Alessandro, Allende, Verona), 1 Ensalada, 1 Fetuccine (Carbonara o Bolognese), Jarra de Limonada, Postre.
+    - Decoración sencilla, letrero LED (Better Together, You+Me, etc.), iluminación vintage.
+    - Servicio de mesero.
+    
+    REGLAS IMPORTANTES:
+    - NO NIÑOS: Por seguridad (explicar amablemente). A menores de 15-17 años solo bebidas sin alcohol.
+    - LLUVIA/CLIMA: No hay reembolsos. En caso de lluvia hay opción de reagendar para alguna fecha disponible.
+    - CANCELACIONES: No hay reembolsos (tu espacio está reservado exclusivamente). Se recomienda regalar o vender la reserva.
+    - EXTERNOS (Mariachis, Fotógrafos): Avisar con tiempo al 8719775150. No cuentan como consumo extra, solo requieren coordinación.
+    - DESCORCHE: $200 (solo vinos de mesa). Al solicitarlo se eliminan las bebidas del paquete.
+    
+    EXTRAS (Precios referenciales del catálogo, confirmar disponibilidad):
+    - Pétalos en mesa ($75), en camino ($200).
+    - Letreros de propuesta ($300).
+    - Botellas: Vino Tinto 3V ($800), Espumoso ($500), Tinto Casa ($300).
+    - Ramos de rosas: 12 ($650), 24 ($1100).
+    ---
+    
     Reglas importantes y críticas:
     - SOLO responde preguntas relacionadas con las reservas del usuario, los precios de todos los productos y extras que ofrece cool morning, y la disponibilidad de los lugares.
     - Si te preguntan sobre otros temas, explica amablemente que solo puedes ayudar con información de sus reservas, de los precios y la disponibilidad de los lugares.
