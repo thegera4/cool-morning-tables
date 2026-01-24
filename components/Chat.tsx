@@ -11,6 +11,9 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
+import { OrderCard } from "@/components/chat/OrderCard";
+import { OrderCardSkeleton } from "@/components/chat/OrderCardSkeleton";
+import { SocialLinks } from "@/components/chat/SocialLinks";
 
 export function Chat() {
   const { user } = useUser();
@@ -81,11 +84,120 @@ export function Chat() {
     handleSend(input);
   };
 
+  /** 
+   * Helper function to parse message content and render OrderCards
+   * @param content The message content to parse
+   * @returns A React element with the parsed message content
+  */
+  const renderMessageContent = (content: string) => {
+    // Check for complete ORDER_CARD blocks
+    const completeOrderCardRegex = /\[ORDER_CARD\]([\s\S]*?)\[\/ORDER_CARD\]/g;
+    // Check for incomplete ORDER_CARD blocks (opening tag without closing)
+    const incompleteOrderCardRegex = /\[ORDER_CARD\]([\s\S]*?)$/;
+
+    const parts: React.JSX.Element[] = [];
+    let lastIndex = 0;
+    let match;
+    let key = 0;
+
+    // Check for [CONTACT_INFO] token
+    const contactInfoRegex = /\[CONTACT\_INFO\]/g;
+
+    // Process complete ORDER_CARD blocks
+    while ((match = completeOrderCardRegex.exec(content)) !== null) {
+      // Add text before the ORDER_CARD
+      if (match.index > lastIndex) {
+        let textBefore = content.substring(lastIndex, match.index);
+
+        // Check if textBefore contains [CONTACT_INFO]
+        const contactMatch = contactInfoRegex.exec(textBefore);
+        if (contactMatch) {
+          const textBeforeContact = textBefore.substring(0, contactMatch.index);
+          if (textBeforeContact.trim()) {
+            parts.push(<span key={`text-${key++}`} className="whitespace-pre-wrap">{textBeforeContact}</span>);
+          }
+          parts.push(<SocialLinks key={`social-${key++}`} />);
+          const textAfterContact = textBefore.substring(contactMatch.index + contactMatch[0].length);
+          if (textAfterContact.trim()) {
+            parts.push(<span key={`text-${key++}`} className="whitespace-pre-wrap">{textAfterContact}</span>);
+          }
+        } else {
+          if (textBefore.trim()) {
+            parts.push(<span key={`text-${key++}`} className="whitespace-pre-wrap">{textBefore}</span>);
+          }
+        }
+      }
+
+      // Parse and render the ORDER_CARD JSON
+      try {
+        const orderData = JSON.parse(match[1].trim());
+        parts.push(<OrderCard key={`card-${key++}`} order={orderData} />);
+      } catch (error) {
+        console.error("Failed to parse ORDER_CARD JSON:", error);
+        // If parsing fails, show a skeleton (still loading)
+        parts.push(<OrderCardSkeleton key={`skeleton-${key++}`} />);
+      }
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add any remaining text after the last ORDER_CARD
+    if (lastIndex < content.length) {
+      let remaining = content.substring(lastIndex);
+
+      // Check if there's an incomplete ORDER_CARD in the remaining text
+      const incompleteMatch = incompleteOrderCardRegex.exec(remaining);
+      if (incompleteMatch) {
+        // Add any text before the incomplete ORDER_CARD
+        let textBeforeIncomplete = remaining.substring(0, incompleteMatch.index);
+
+        // Check for [CONTACT_INFO] in the remaining text before the incomplete block
+        const contactMatch = contactInfoRegex.exec(textBeforeIncomplete);
+        if (contactMatch) {
+          const textBeforeContact = textBeforeIncomplete.substring(0, contactMatch.index);
+          if (textBeforeContact.trim()) {
+            parts.push(<span key={`text-${key++}`} className="whitespace-pre-wrap">{textBeforeContact}</span>);
+          }
+          parts.push(<SocialLinks key={`social-${key++}`} />);
+          const textAfterContact = textBeforeIncomplete.substring(contactMatch.index + contactMatch[0].length);
+          if (textAfterContact.trim()) {
+            parts.push(<span key={`text-${key++}`} className="whitespace-pre-wrap">{textAfterContact}</span>);
+          }
+        } else {
+          if (textBeforeIncomplete.trim()) {
+            parts.push(<span key={`text-${key++}`} className="whitespace-pre-wrap">{textBeforeIncomplete}</span>);
+          }
+        }
+
+        // Show skeleton for incomplete ORDER_CARD (don't show the raw JSON)
+        parts.push(<OrderCardSkeleton key={`skeleton-${key++}`} />);
+      } else {
+        // No incomplete ORDER_CARD, just check for CONTACT_INFO in remaining text
+        const contactMatch = contactInfoRegex.exec(remaining);
+        if (contactMatch) {
+          const textBeforeContact = remaining.substring(0, contactMatch.index);
+          if (textBeforeContact.trim()) {
+            parts.push(<span key={`text-${key++}`} className="whitespace-pre-wrap">{textBeforeContact}</span>);
+          }
+          parts.push(<SocialLinks key={`social-${key++}`} />);
+          const textAfterContact = remaining.substring(contactMatch.index + contactMatch[0].length);
+          if (textAfterContact.trim()) {
+            parts.push(<span key={`text-${key++}`} className="whitespace-pre-wrap">{textAfterContact}</span>);
+          }
+        } else if (remaining.trim()) {
+          parts.push(<span key={`text-${key++}`} className="whitespace-pre-wrap">{remaining}</span>);
+        }
+      }
+    }
+
+    // If no ORDER_CARDs were found, return the original content
+    return parts.length > 0 ? <div className="flex flex-col gap-2">{parts}</div> : <span className="whitespace-pre-wrap">{content}</span>;
+  };
+
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button className={cn(
-          "transition-colors hover:cursor-pointer hover:text-brand-teal",
+        <button className={cn("transition-colors hover:cursor-pointer hover:text-brand-teal",
           pathname === "/reservas" ? "text-brand-teal" : "text-white"
         )}>
           <span className="sr-only">Chat AI</span>
@@ -103,7 +215,6 @@ export function Chat() {
             Asistente virtual de Cool Morning para ayudarte con reservas y dudas.
           </SheetDescription>
         </SheetHeader>
-
         <ScrollArea className="flex-1 p-4 bg-gray-50/50 relative z-10">
           <div className="flex flex-col gap-4 min-h-0">
             {messages.length === 0 && (
@@ -112,15 +223,11 @@ export function Chat() {
                   <div className="h-12 w-12 bg-brand-brown/10 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Bot className="h-6 w-6 text-brand-brown" />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    Hola!,  ¿Cómo puedo ayudarte hoy?
-                  </h3>
+                  <h3 className="text-xl font-semibold text-gray-900">Hola!, ¿Cómo puedo ayudarte hoy?</h3>
                   <p className="text-sm text-gray-500 max-w-[280px] mx-auto">
-                    Puedo ayudarte a encontrar un lugar, verificar tus
-                    reservas, cotizarte y más.
+                    Puedo ayudarte a encontrar un lugar, verificar tus reservas, cotizarte y más.
                   </p>
                 </div>
-
                 <div className="space-y-6">
                   <div className="space-y-3">
                     <h4 className="text-xs text-gray-400 font-medium uppercase tracking-wider flex items-center justify-center gap-2">
@@ -185,14 +292,12 @@ export function Chat() {
             {messages.map((m) => (
               <div
                 key={m.id}
-                className={cn(
-                  "flex gap-3 text-sm max-w-[85%]",
+                className={cn("flex gap-3 text-sm max-w-[85%]",
                   m.role === "user" ? "ml-auto flex-row-reverse" : "mr-auto"
                 )}
               >
                 <div
-                  className={cn(
-                    "h-8 w-8 rounded-full flex items-center justify-center shrink-0 border",
+                  className={cn("h-8 w-8 rounded-full flex items-center justify-center shrink-0 border",
                     m.role === "user"
                       ? "bg-brand-teal text-white border-brand-teal"
                       : "bg-white text-brand-brown border-gray-200"
@@ -201,30 +306,19 @@ export function Chat() {
                   {m.role === "user" ? (
                     user?.imageUrl ? (
                       <div className="relative h-8 w-8 rounded-full overflow-hidden">
-                        <Image
-                          src={user.imageUrl}
-                          alt="User"
-                          fill
-                          className="object-cover"
-                          aria-describedby="user-image"
-                        />
+                        <Image src={user.imageUrl} alt="User" fill className="object-cover" aria-describedby="user-image" />
                       </div>
-                    ) : (
-                      <User className="h-4 w-4" />
-                    )
-                  ) : (
-                    <Bot className="h-4 w-4" />
-                  )}
+                    ) : (<User className="h-4 w-4" />)
+                  ) : (<Bot className="h-4 w-4" />)}
                 </div>
                 <div
-                  className={cn(
-                    "p-3 rounded-lg shadow-sm whitespace-pre-wrap",
+                  className={cn("p-3 rounded-lg shadow-sm",
                     m.role === "user"
-                      ? "bg-brand-teal text-white rounded-tr-none"
+                      ? "bg-brand-teal text-white rounded-tr-none whitespace-pre-wrap"
                       : "bg-white text-gray-800 rounded-tl-none border border-gray-100"
                   )}
                 >
-                  {m.content}
+                  {m.role === "assistant" ? renderMessageContent(m.content) : m.content}
                 </div>
               </div>
             ))}
@@ -244,12 +338,8 @@ export function Chat() {
             <div ref={scrollRef} />
           </div>
         </ScrollArea>
-
         <div className="p-4 border-t bg-white relative z-10">
-          <form
-            onSubmit={handleSubmit}
-            className="flex items-center gap-2"
-          >
+          <form onSubmit={handleSubmit} className="flex items-center gap-2">
             <textarea
               ref={(ref) => {
                 if (ref) {
