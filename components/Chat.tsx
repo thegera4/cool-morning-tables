@@ -11,6 +11,8 @@ import { cn } from "@/lib/utils";
 import { useUser } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
+import { OrderCard } from "@/components/chat/OrderCard";
+import { OrderCardSkeleton } from "@/components/chat/OrderCardSkeleton";
 
 export function Chat() {
   const { user } = useUser();
@@ -79,6 +81,65 @@ export function Chat() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     handleSend(input);
+  };
+
+  // Helper function to parse message content and render OrderCards
+  const renderMessageContent = (content: string) => {
+    // Check for complete ORDER_CARD blocks
+    const completeOrderCardRegex = /\[ORDER_CARD\]([\s\S]*?)\[\/ORDER_CARD\]/g;
+    // Check for incomplete ORDER_CARD blocks (opening tag without closing)
+    const incompleteOrderCardRegex = /\[ORDER_CARD\]([\s\S]*?)$/;
+
+    const parts: React.JSX.Element[] = [];
+    let lastIndex = 0;
+    let match;
+    let key = 0;
+
+    // Process complete ORDER_CARD blocks
+    while ((match = completeOrderCardRegex.exec(content)) !== null) {
+      // Add text before the ORDER_CARD
+      if (match.index > lastIndex) {
+        const textBefore = content.substring(lastIndex, match.index);
+        if (textBefore.trim()) {
+          parts.push(<span key={`text-${key++}`} className="whitespace-pre-wrap">{textBefore}</span>);
+        }
+      }
+
+      // Parse and render the ORDER_CARD JSON
+      try {
+        const orderData = JSON.parse(match[1].trim());
+        parts.push(<OrderCard key={`card-${key++}`} order={orderData} />);
+      } catch (error) {
+        console.error("Failed to parse ORDER_CARD JSON:", error);
+        // If parsing fails, show a skeleton (still loading)
+        parts.push(<OrderCardSkeleton key={`skeleton-${key++}`} />);
+      }
+
+      lastIndex = match.index + match[0].length;
+    }
+
+    // Add any remaining text after the last ORDER_CARD
+    if (lastIndex < content.length) {
+      const remaining = content.substring(lastIndex);
+
+      // Check if there's an incomplete ORDER_CARD in the remaining text
+      const incompleteMatch = incompleteOrderCardRegex.exec(remaining);
+      if (incompleteMatch) {
+        // Add any text before the incomplete ORDER_CARD
+        const textBeforeIncomplete = remaining.substring(0, incompleteMatch.index);
+        if (textBeforeIncomplete.trim()) {
+          parts.push(<span key={`text-${key++}`} className="whitespace-pre-wrap">{textBeforeIncomplete}</span>);
+        }
+        // Show skeleton for incomplete ORDER_CARD (don't show the raw JSON)
+        parts.push(<OrderCardSkeleton key={`skeleton-${key++}`} />);
+      } else if (remaining.trim()) {
+        // No incomplete ORDER_CARD, just add the remaining text
+        parts.push(<span key={`text-${key++}`} className="whitespace-pre-wrap">{remaining}</span>);
+      }
+    }
+
+    // If no ORDER_CARDs were found, return the original content
+    return parts.length > 0 ? <div className="flex flex-col gap-2">{parts}</div> : <span className="whitespace-pre-wrap">{content}</span>;
   };
 
   return (
@@ -218,13 +279,13 @@ export function Chat() {
                 </div>
                 <div
                   className={cn(
-                    "p-3 rounded-lg shadow-sm whitespace-pre-wrap",
+                    "p-3 rounded-lg shadow-sm",
                     m.role === "user"
-                      ? "bg-brand-teal text-white rounded-tr-none"
+                      ? "bg-brand-teal text-white rounded-tr-none whitespace-pre-wrap"
                       : "bg-white text-gray-800 rounded-tl-none border border-gray-100"
                   )}
                 >
-                  {m.content}
+                  {m.role === "assistant" ? renderMessageContent(m.content) : m.content}
                 </div>
               </div>
             ))}
