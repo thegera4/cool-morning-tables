@@ -27,6 +27,22 @@ interface CreateOrderParams {
 
 export async function createOrder({ paymentIntentId, items, totalAmount, customerName, reservationDate, customerPhone, time, locationName, locationAddress }: CreateOrderParams) {
   console.log("createOrder action called with:", { paymentIntentId, totalAmount, itemsCount: items.length });
+
+  // Server-side validation
+  if (customerName) {
+    const nameRegex = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
+    if (!nameRegex.test(customerName)) {
+      return { success: false, error: "Invalid name format. Only letters and spaces are allowed." };
+    }
+  }
+
+  if (customerPhone) {
+    const phoneDigits = customerPhone.replace(/\D/g, "");
+    if (phoneDigits.length !== 10) {
+      return { success: false, error: "Invalid phone number. Must be 10 digits." };
+    }
+  }
+
   try {
     const user = await currentUser();
     if (!user) { throw new Error("Unauthorized"); }
