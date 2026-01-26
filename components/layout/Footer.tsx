@@ -28,7 +28,7 @@ export function Footer() {
                 </div>
 
                 <div className="flex flex-col lg:flex-row items-center gap-4 lg:gap-8">
-                    <Link href="/CENA%20COLUMPIOS%202026.pdf" target="_blank" rel="noopener noreferrer" className="text-xs font-bold tracking-widest text-white/80 hover:text-white transition-colors">
+                    <Link href="/catalogo-2026.pdf" target="_blank" rel="noopener noreferrer" className="text-xs font-bold tracking-widest text-white/80 hover:text-white transition-colors">
                         VER CATALOGO
                     </Link>
                     <SignedIn>
