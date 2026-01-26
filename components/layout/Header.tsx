@@ -31,14 +31,14 @@ export function Header({ isChatEnabled = true }: HeaderProps) {
 
       {/* Desktop Navigation */}
       <div className="hidden md:flex items-center gap-6">
-        <Link
-          href="/CENA%20COLUMPIOS%202026.pdf"
+        <a
+          href="/catalogo-2026.pdf"
           target="_blank"
           rel="noopener noreferrer"
           className="text-white text-sm font-medium tracking-wider uppercase hover:underline underline-offset-4"
         >
           VER CATALOGO
-        </Link>
+        </a>
         <SignedIn>
           {isReservationsPage ? (
             <Link
