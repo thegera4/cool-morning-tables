@@ -51,7 +51,7 @@ export function Hero({ title, description, imageUrl }: HeroProps) {
               asChild
               className="bg-transparent hover:bg-white/10 text-white hover:text-whiteborder-white/40 hover:border-white rounded-full px-8 h-10 text-xs font-bold tracking-wide uppercase backdrop-blur-sm cursor-pointer"
             >
-              <Link href="/CENA%20COLUMPIOS%202026.pdf" target="_blank" rel="noopener noreferrer">Ver Catalogo</Link>
+              <Link href="/catalogo-2026.pdf" target="_blank" rel="noopener noreferrer">Ver Catalogo</Link>
             </Button>
           </div>
         </div>
