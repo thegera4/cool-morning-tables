@@ -207,3 +207,63 @@ export async function sendRemainingPaymentEmail(to: string, details: RemainingPa
     html,
   });
 }
+
+interface PaymentReminderEmailDetails {
+  customerName: string;
+  orderNumber: string;
+  date: string;
+  amountPending: number;
+  locationName: string;
+  daysRemaining: number;
+}
+
+const PAYMENT_REMINDER_TEMPLATE = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; line-height: 1.6; background-color: #ffffff;">
+      <div style="text-align: center; padding: 20px 0;">
+        <img src="https://coolmorning.com.mx/wp-content/uploads/2024/10/cropped-logotipo-cool-120x56.png" alt="Cool Morning" style="height: 50px; object-fit: contain;">
+      </div>
+
+      <div style="padding: 20px; border-radius: 8px; border: 1px solid #fcd34d; background-color: #fffbeb;">
+        <h2 style="color: #b45309; font-size: 18px; margin-top: 0; text-align: center;">⚠️ Recordatorio de Pago Pendiente</h2>
+        
+        <p>Hola {{customerName}}, te recordamos que tu reserva está próxima y tienes un saldo pendiente por liquidar.</p>
+
+        <div style="background-color: white; padding: 15px; border-radius: 4px; border: 1px solid #e5e7eb; margin: 20px 0;">
+             <p style="margin: 5px 0;"><strong>Orden:</strong> {{orderNumber}}</p>
+             <p style="margin: 5px 0;"><strong>Fecha de Reserva:</strong> {{date}}</p>
+             <p style="margin: 5px 0;"><strong>Lugar:</strong> {{locationName}}</p>
+             <p style="margin: 15px 0 5px 0; color: #dc2626; font-size: 18px;"><strong>Saldo Pendiente: $\{{amountPending}} MXN</strong></p>
+        </div>
+
+        <p style="font-size: 14px; color: #555;">Recuerda que debes liquidar el total de tu reserva antes del evento para garantizar tu acceso.</p>
+
+        <div style="text-align: center; margin-top: 25px;">
+            <a href="https://cool-morning-tables.vercel.app/reservas" style="background-color: #04A595; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">Ir a Mis Reservas para Pagar</a>
+        </div>
+      </div>
+
+      <div style="background-color: #04A595; color: white; padding: 20px; text-align: center; margin-top: 30px; border-radius: 8px;">
+          <h4 style="margin: 0 0 10px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.9);">Contacto</h4>
+          
+          <div style="margin-bottom: 15px;">
+             <a href="https://wa.me/528711390732" style="color: white; text-decoration: none; margin: 0 10px; display: inline-block;">
+                <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp" width="24" height="24" style="vertical-align: middle;">
+             </a>
+          </div>
+
+          <a href="https://coolmorning.com.mx/" style="color: rgba(255,255,255,0.9); text-decoration: none; font-size: 12px; letter-spacing: 1px; font-weight: bold;">COOLMORNING.COM.MX</a>
+      </div>
+    </div>
+`;
+
+export async function sendPaymentReminderEmail(to: string, details: PaymentReminderEmailDetails) {
+  const template = Handlebars.compile(PAYMENT_REMINDER_TEMPLATE);
+  const html = template(details);
+
+  await transporter.sendMail({
+    from: '"Cool Morning" <' + process.env.EMAIL_USER + '>',
+    to,
+    subject: `Recordatorio de Pago Pendiente ⚠️ - ${details.orderNumber}`,
+    html,
+  });
+}
